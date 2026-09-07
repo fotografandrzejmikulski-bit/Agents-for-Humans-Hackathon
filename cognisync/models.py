@@ -12,6 +12,12 @@ class RiskLevel(StrEnum):
     CRITICAL = "critical"
 
 
+class DecisionStatus(StrEnum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
 @dataclass(slots=True)
 class ProjectItem:
     id: str
@@ -32,11 +38,13 @@ class Insight:
 
 @dataclass(slots=True)
 class DecisionRequest:
+    decision_id: str
     action: str
     reason: str
     risk: RiskLevel
     evidence: list[str]
     proposed_payload: dict[str, Any]
+    status: DecisionStatus = DecisionStatus.PENDING
 
 
 @dataclass(slots=True)
