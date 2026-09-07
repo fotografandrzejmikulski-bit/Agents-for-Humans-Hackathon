@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -31,12 +31,16 @@ def _serialize(result: Any) -> dict[str, Any]:
         "decision_request": None,
     }
     if result.decision_request:
+        decision = result.decision_request
         payload["decision_request"] = {
-            "action": result.decision_request.action,
-            "risk": str(result.decision_request.risk),
-            "reason": result.decision_request.reason,
-            "evidence": result.decision_request.evidence,
-            "proposed_payload": result.decision_request.proposed_payload,
+            "decision_id": decision.decision_id,
+            "action": decision.action,
+            "risk": decision.risk.value,
+            "reason": decision.reason,
+            "evidence": decision.evidence,
+            "proposed_payload": decision.proposed_payload,
+            "decision_status": decision.status.value,
+            "external_execution": "not_performed",
         }
     return payload
 
@@ -46,8 +50,16 @@ def main() -> None:
     parser.add_argument("--request", default="Prepare today's project brief and identify decision points.")
     parser.add_argument("--data-dir", default="data")
     parser.add_argument("--pretty", action="store_true")
-    parser.add_argument("--demo-gate", action="store_true", help="Request an external action to demonstrate HITL gating")
-    parser.add_argument("--approve", action="store_true", help="Resolve a demo decision as approved; never executes a real side effect")
+    parser.add_argument(
+        "--demo-gate",
+        action="store_true",
+        help="Request an external action to demonstrate HITL gating",
+    )
+    parser.add_argument(
+        "--approve",
+        action="store_true",
+        help="Resolve a demo decision as approved; never executes a real side effect",
+    )
     args = parser.parse_args()
 
     request = args.request
@@ -59,9 +71,19 @@ def main() -> None:
     result = CogniSyncEngine(store, audit).run(request)
 
     if result.decision_request and args.approve:
-        resolution = DecisionGate(DEFAULT_POLICY, audit).resolve(result.decision_request, approved=True)
-        result.summary += f" {resolution.message}"
+        resolution = DecisionGate(DEFAULT_POLICY, audit).resolve(
+            result.decision_request,
+            approved=True,
+        )
+        result.summary += f" {resolution.message} No external side effect was performed by the local demo."
 
     print(json.dumps(_serialize(result), ensure_ascii=False, indent=2 if args.pretty else None))
     if result.status == "decision_required" and not args.approve:
-        print("\nHuman decision required: rerun with --approve only for the local demo resolution path.", file=os.sys.stderr)
+        print(
+            "\nHuman decision required: rerun with --approve only for the local demo resolution path.",
+            file=sys.stderr,
+        )
+
+
+if __name__ == "__main__":
+    main()
