@@ -7,26 +7,23 @@ from .config import Settings
 try:
     from strands import Agent
     from strands.models import BedrockModel
-except ImportError:  # pragma: no cover - optional at import time for local core tests
+except ImportError:  # pragma: no cover
     Agent = None  # type: ignore[assignment,misc]
     BedrockModel = None  # type: ignore[assignment,misc]
 
-
 SYSTEM_PROMPT = """You are CogniSync Professional, a background work agent.
-Your job is to reduce repetitive professional work without creating notification noise.
-Read and analyze supplied project inputs, identify decisions, dependencies and follow-ups,
-and produce a decision-ready brief. Never claim an external action was completed unless a
-real tool confirms it. Treat external side effects as gated operations requiring approval.
-Prefer concise evidence-backed outputs and preserve provenance for important claims.
-"""
+Reduce repetitive professional coordination work while preserving human control.
+Analyze supplied project signals, identify changes, blockers and follow-ups, then produce
+concise evidence-backed work. Never claim an external action happened unless a real tool
+confirms it. Treat consequential side effects as authorization-gated operations. Prefer
+useful, quiet background work over unnecessary notifications."""
 
 
-def build_strands_agent() -> Any:
-    """Build the real Strands/Bedrock agent when optional dependencies are installed."""
+def build_strands_agent(settings: Settings | None = None) -> Any:
+    """Build the real Strands/Bedrock agent when AWS dependencies are installed."""
     if Agent is None or BedrockModel is None:
-        raise RuntimeError("Install the project with the 'aws' extra or install strands-agents.")
-
-    settings = Settings.from_env()
+        raise RuntimeError("Install the project with the 'aws' extra to use the Strands adapter.")
+    settings = settings or Settings.from_env()
     model = BedrockModel(
         model_id=settings.model_id,
         temperature=settings.temperature,
