@@ -1,0 +1,5 @@
+profile,gpu_layers,context_size,kv_cache,expected_role,measure
+baseline,18,16384,q8_0,low-memory stability,measure VRAM/RAM/TPS
+balanced,20,16384,q8_0,default engineering,measure VRAM/RAM/TPS
+context-heavy,18,32768,q8_0,long-document analysis,measure VRAM/RAM/TPS
+throughput,20,8192,q8_0,interactive coding,measure first-token latency/TPS
