@@ -17,19 +17,30 @@ def test_engine_creates_evidence_backed_result(tmp_path) -> None:
     assert result.status == "completed"
     assert result.insights
     assert result.insights[0].evidence == ["email: Launch", "notes: Accessibility"]
+    assert "No consequential side effect" in result.summary
     assert (tmp_path / "data" / "audit.jsonl").exists()
 
 
-def test_engine_emits_gate_for_external_action(tmp_path, monkeypatch) -> None:
+def test_engine_emits_gate_for_external_action(tmp_path) -> None:
     data = tmp_path / "data"
-    store = ProjectStore(data)
     audit = AuditLog(data / "audit.jsonl")
-    monkeypatch.setenv("COGNISYNC_SEND", "1")
-    result = CogniSyncEngine(store, audit).run(
-        "send follow-up",
+    result = CogniSyncEngine(ProjectStore(data), audit).run(
+        "prepare and send follow-up",
         [ProjectItem("1", "email", "Client", "Approval needed.")],
     )
     assert result.status == "decision_required"
     assert result.decision_request is not None
+    assert result.decision_request.action == "send_external_message"
     events = [json.loads(line) for line in (data / "audit.jsonl").read_text().splitlines()]
-    assert any(event["event"] == "decision.gated" for event in events)
+    assert any(event["event"] == "decision.requested" for event in events)
+
+
+def test_unknown_side_effects_fail_closed(tmp_path) -> None:
+    data = tmp_path / "data"
+    audit = AuditLog(data / "audit.jsonl")
+    result = CogniSyncEngine(ProjectStore(data), audit).run(
+        "invoke unknown_side_effect",
+        [ProjectItem("1", "notes", "Unknown", "Review this instruction.")],
+    )
+    assert result.status == "completed"
+    assert result.decision_request is None
