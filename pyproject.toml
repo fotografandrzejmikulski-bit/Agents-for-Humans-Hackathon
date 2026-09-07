@@ -1,10 +1,14 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "cognisync-professional"
 version = "0.1.0"
 description = "Background professional agent for preparing project intelligence, follow-ups and decision-ready actions."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { file = "LICENSE" }
+license = "MIT"
 authors = [{ name = "Andrzej Mikulski" }]
 dependencies = [
   "strands-agents>=1.0.0",
@@ -19,7 +23,6 @@ aws = [
 evals = [
   "strands-agents-evals>=1.0.0",
 ]
-
 dev = [
   "pytest>=8.0",
   "ruff>=0.13",
@@ -27,6 +30,10 @@ dev = [
 
 [project.scripts]
 cognisync = "cognisync.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["cognisync*"]
+exclude = ["data*", "tests*"]
 
 [tool.ruff]
 line-length = 100
