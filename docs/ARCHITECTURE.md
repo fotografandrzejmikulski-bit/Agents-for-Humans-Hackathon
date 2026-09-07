@@ -4,9 +4,9 @@
 
 CogniSync is a background-first professional agent. Its architecture separates **cognitive work** from **consequential execution**.
 
-The central invariant is:
+### Core invariant
 
-> The agent may autonomously inspect, classify, summarize and prepare. It may not silently create externally consequential side effects.
+> The agent may inspect, classify, summarize and prepare autonomously. It may not silently create externally consequential side effects.
 
 ## 2. Runtime topology
 
@@ -18,31 +18,27 @@ flowchart TB
     C[CRM / Project System]
     N[Notes / Meeting Artifacts]
   end
-
   subgraph ToolPlane[Tool & Integration Plane]
-    M[MCP adapters]
-    G[Amazon Bedrock AgentCore Gateway]
+    M[MCP Adapters]
+    G[AgentCore Gateway]
   end
-
   subgraph Cognition[CogniSync Cognition Plane]
-    S[Supervisor Agent\nStrands Agents]
-    X[Specialist Agents\noptional A2A]
-    R[Risk / Policy Engine]
-    V[Evidence & Provenance]
+    S[Supervisor Agent\nStrands]
+    X[Bounded Specialist Agents\nA2A]
+    V[Evidence / Provenance]
+    R[Consequence Policy]
   end
-
   subgraph State[State Plane]
     STM[Session Context]
-    LTM[Long-term Memory]
+    LTM[AgentCore Memory]
     A[Append-only Audit]
   end
-
   subgraph Action[Action Plane]
-    BG[Autonomous Safe Actions]
+    BG[Safe Background Work]
     HITL[Human Decision Gate]
-    O[External Side Effect]
+    O[External Effect]
+    BL[Block / Escalate]
   end
-
   E --> M
   F --> M
   C --> M
@@ -51,100 +47,111 @@ flowchart TB
   S <--> STM
   S <--> LTM
   S --> X
-  X --> V
   S --> V
+  X --> V
   V --> R
-  R -->|safe| BG
-  R -->|high/unknown risk| HITL
+  R -->|low| BG
+  R -->|medium| HITL
+  R -->|high| HITL
+  R -->|critical| BL
   HITL -->|approved| O
-  R --> A
   BG --> A
   HITL --> A
   O --> A
+  BL --> A
+  BG --> OUT[Decision-ready Brief]
+  HITL --> OUT
 ```
 
-## 3. Why the separation matters
+## 3. Separation of concerns
 
-A conventional agent often conflates three questions:
+CogniSync treats three questions independently:
 
-1. What information is available?
-2. What should be done?
-3. Is the system authorized to do it now?
+1. **What is known?** — evidence, source records and context.
+2. **What should happen?** — agent reasoning and planning.
+3. **Is it authorized now?** — explicit consequence policy.
 
-CogniSync models these independently. This reduces the probability that a correct inference accidentally becomes an unauthorized side effect.
+This prevents a correct model inference from being treated as automatic authorization.
 
 ## 4. Strands layer
 
-Strands is the agent orchestration layer. It owns the agent loop, tool selection and model interaction. Strands' current documentation describes invocation limits, cancellation, concurrent-invocation protection, hooks and retry strategies as part of the agent loop. citeturn493810search1
+Strands is the orchestration layer. It owns the agent loop, model interaction and tool use. The project keeps the deterministic safety policy outside the model so that changing models does not silently change authorization rules.
 
-Strands 1.0 also added multi-agent primitives and A2A support. Remote agents can be consumed through `A2AAgent`. citeturn888617search5turn493810search0
+The live adapter exposes a narrow integration point in `cognisync.agent`, while the local engine remains deterministic and judgeable.
 
 ## 5. Memory layer
 
-The production implementation can use AgentCore Memory. Built-in strategies cover user preferences, semantic facts and session summaries; the Strands session-manager integration supports STM and LTM with batching and explicit/automatic flush behavior. citeturn493810search3turn493810search4turn916868search2
+The production design uses:
 
-Memory is not treated as an unrestricted source of truth. Important external decisions retain explicit evidence in the current run.
+- session context for the active workflow;
+- AgentCore Memory for durable summaries, semantic facts and stable user preferences.
 
-## 6. MCP / gateway layer
+Memory can improve continuity but does not grant authority. Important decisions retain current-run evidence.
 
-AgentCore Gateway is the integration boundary. It gives the agent a unified MCP tool surface and manages authentication and target invocation. citeturn493810search2turn493810search11
+## 6. MCP / Gateway layer
 
-This boundary is the correct location for provider-specific credentials and integration policy. Application code should receive tool results, not raw API credentials.
+AgentCore Gateway is the integration perimeter for professional systems. It can expose MCP tool surfaces and apply inbound/outbound authorization. Provider-specific credentials remain at this boundary rather than entering prompts or model context.
 
-## 7. A2A specialist workers
+Remote resource identifiers should be constrained to trusted schemes and patterns to reduce SSRF/local-resource risks.
 
-A2A is used only when decomposition creates an operational advantage. Examples:
+## 7. A2A specialist layer
 
-- classification worker;
-- document-structure worker;
-- reporting worker;
-- quality/review worker.
+A2A is used only when bounded specialization creates measurable value. Example workers include classification, document structure extraction, reporting and quality review.
 
-The supervisor should delegate bounded tasks instead of spawning unconstrained agent swarms. AWS documents AgentCore Runtime support for A2A with stateless streamable HTTP on port 9000, Agent Cards, JSON-RPC and supported authentication schemes. citeturn888617search0turn888617search2
+The supervisor should delegate narrow tasks rather than create an unconstrained agent swarm.
 
-## 8. Safety model
-
-CogniSync uses a fail-closed action taxonomy:
+## 8. Safety policy
 
 | Risk | Examples | Default |
 |---|---|---|
 | Low | read, classify, summarize, draft | autonomous |
-| Medium | internal reversible preparation | policy-dependent |
-| High | send, publish, modify CRM/calendar, payment | approval |
-| Critical | unknown capability, destructive/privilege escalation | block + approval |
+| Medium | reversible internal preparation | policy-dependent |
+| High | send, publish, modify records, payment | approval |
+| Critical | unknown, destructive, privilege escalation | block + explicit decision |
 
-The local prototype implements this policy in `cognisync/policy.py`.
+The local implementation lives in `cognisync/policy.py` and is tested independently.
 
-## 9. Execution isolation
+## 9. Audit and provenance
 
-For file/shell work, the current Strands ecosystem includes Strands Shell, whose default policy provides an in-process virtual filesystem and deny-by-default network/credential handling. AWS AgentCore Runtime remains the stronger production isolation boundary for hosted workloads. Strands Shell is explicitly a mediation layer, not a hardened OS sandbox, so the threat model must not overstate its guarantees. citeturn916868search1turn916868search6
+Each meaningful workflow produces machine-readable audit events. Source records can also be represented by provenance hashes. The target event chain is:
 
-## 10. Observability and evaluation
+`run → analysis → evidence → policy → decision → effect`
 
-Every run emits machine-readable audit events. In production, OpenTelemetry traces should correlate:
+Production telemetry should preserve the same correlation ID across all distributed components.
 
-`run_id → agent decision → tool call → policy decision → human gate → final effect`
+## 10. Failure handling
 
-Evaluation should include cooperative, adversarial and fault-injection scenarios. Strands Evals supports trajectory/tool-use evaluation, trace analysis, failure diagnosis, chaos testing and red-team evaluation. citeturn493810search9turn493810search6
+The design explicitly handles:
+
+- empty input — remain idle rather than fabricate work;
+- unknown action — classify as critical;
+- tool timeout — retry only if policy allows, otherwise fail safely;
+- malformed tool result — no false completion;
+- external side effect — require connector confirmation;
+- prompt injection — treat external content as untrusted data, never authority.
 
 ## 11. Deployment progression
 
 ### Stage A — local judgeable prototype
 
-No AWS credentials required. Run unit tests and deterministic sample workflow.
+No AWS credentials required. Run tests and deterministic demo.
 
 ### Stage B — Bedrock model
 
-Install the AWS extra and configure a Bedrock model ID.
+Install the AWS extra and configure a supported model ID.
 
 ### Stage C — AgentCore Runtime
 
-Use the AgentCore CLI/project scaffolding and deploy the agent. For A2A deployments, follow the current AgentCore contract instead of relying on hard-coded legacy examples. citeturn888617search0turn888617search2
+Use the current AgentCore CLI/project scaffolding and deployment workflow. AWS currently documents A2A deployment with `StrandsA2AExecutor` and `serve_a2a`, with port 9000 as the default A2A server port. 
 
 ### Stage D — real MCP integrations
 
-Connect selected professional systems through AgentCore Gateway. Keep each target narrowly scoped and auditable.
+Connect narrowly scoped professional systems through AgentCore Gateway with explicit authorization.
 
-### Stage E — continuous evaluation
+### Stage E — bounded A2A specialization
 
-Run regression, chaos and adversarial suites on every production change.
+Introduce remote specialist agents only where benchmarks demonstrate a measurable advantage.
+
+### Stage F — continuous evaluation
+
+Run regression, adversarial and fault-injection evaluation on each meaningful change.
