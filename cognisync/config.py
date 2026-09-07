@@ -11,7 +11,7 @@ class Settings:
     temperature: float = 0.2
 
     @classmethod
-    def from_env(cls) -> "Settings":
+    def from_env(cls) -> Settings:
         return cls(
             region=os.getenv("AWS_DEFAULT_REGION", "us-east-1"),
             model_id=os.getenv("COGNISYNC_MODEL_ID", "amazon.nova-pro-v1:0"),
