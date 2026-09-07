@@ -8,6 +8,7 @@ from .models import Insight
 @dataclass(frozen=True, slots=True)
 class VerificationResult:
     passed: bool
+    status: str
     checks: tuple[str, ...]
     failures: tuple[str, ...]
 
@@ -26,6 +27,26 @@ def verify_insight(insight: Insight) -> VerificationResult:
         failures.append("missing recommended action")
     return VerificationResult(
         passed=not failures,
+        status="passed" if not failures else "failed",
         checks=("schema", "evidence", "confidence", "actionability"),
+        failures=tuple(failures),
+    )
+
+
+def verify_insights(insights: list[Insight], evidence: list[str]) -> VerificationResult:
+    failures: list[str] = []
+    if not insights:
+        failures.append("no insights produced")
+    if not evidence:
+        failures.append("no evidence produced")
+
+    for index, insight in enumerate(insights, start=1):
+        result = verify_insight(insight)
+        failures.extend(f"insight[{index}]: {failure}" for failure in result.failures)
+
+    return VerificationResult(
+        passed=not failures,
+        status="passed" if not failures else "failed",
+        checks=("collection", "schema", "evidence", "confidence", "actionability"),
         failures=tuple(failures),
     )
