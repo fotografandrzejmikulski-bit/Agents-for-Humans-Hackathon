@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import asdict
 from pathlib import Path
 from typing import Iterable
 
@@ -27,7 +28,7 @@ class ProjectStore:
         self.root.mkdir(parents=True, exist_ok=True)
         target = self.root / f"{item.id}.json"
         target.write_text(
-            json.dumps(item.__dict__, ensure_ascii=False, indent=2),
+            json.dumps(asdict(item), ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
         return target
