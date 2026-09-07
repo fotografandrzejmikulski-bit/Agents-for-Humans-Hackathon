@@ -4,17 +4,17 @@ import argparse
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 from .audit import AuditLog
 from .decision import DecisionGate
 from .engine import CogniSyncEngine
-from .models import ProjectItem
 from .policy import DEFAULT_POLICY
 from .store import ProjectStore
 
 
-def _serialize(result) -> dict:
-    payload = {
+def _serialize(result: Any) -> dict[str, Any]:
+    payload: dict[str, Any] = {
         "run_id": result.run_id,
         "status": result.status,
         "summary": result.summary,
