@@ -14,7 +14,7 @@ class EvidenceRecord:
     content_hash: str
 
     @classmethod
-    def from_item(cls, item: ProjectItem) -> "EvidenceRecord":
+    def from_item(cls, item: ProjectItem) -> EvidenceRecord:
         digest = sha256(item.content.encode("utf-8")).hexdigest()
         return cls(item.id, item.source, item.title, digest)
 
