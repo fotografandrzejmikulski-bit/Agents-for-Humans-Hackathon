@@ -1,344 +1,401 @@
-# Grant Proposal
-
-## CogniSync Professional
-### A background-first AI system for reducing repetitive professional work while preserving human control
+# CogniSync Professional
+## Grant Application — Agents for Humans Hackathon 2026
 
 **Applicant:** Andrzej Mikulski  
 **Track:** Professional Agents  
-**Hackathon:** Agents for Humans Hackathon 2026  
 **Repository:** https://github.com/fotografandrzejmikulski-bit/Agents-for-Humans-Hackathon
 
 ---
 
 ## 1. Executive Summary
 
-CogniSync Professional is an AI agent designed to remove repetitive professional work without forcing professionals to become full-time operators of an AI system.
+CogniSync Professional is a background-first AI agent designed to remove repetitive professional coordination work while preserving human authority over consequential decisions.
 
-The system continuously processes project signals — messages, documents, notes, status updates and structured business records — and converts them into evidence-backed summaries, detected blockers, follow-up drafts and decision-ready work packages. It performs low-risk preparation autonomously. When a proposed action would create an external or consequential side effect, CogniSync stops and asks the human to decide.
+Instead of making a professional continuously operate an assistant, CogniSync runs a controlled work loop: it gathers project signals, interprets what changed, prepares evidence-backed summaries and follow-ups, detects blockers, and waits at the consequence boundary. Routine information work can proceed autonomously. Sending a message, publishing a deliverable, modifying a business record, making a payment, or deleting information requires explicit authorization.
 
-The core innovation is therefore not simply greater autonomy. It is **bounded autonomy optimized for human attention**.
+The thesis is simple: **the agent should absorb repetitive cognitive overhead without becoming another system the human must manage.** Human attention is treated as the scarce resource.
 
-The project targets creators, independent professionals, consultants, makers and small-business owners whose days are fragmented by repetitive coordination and judgment-heavy administrative work. The Professional Agents track explicitly calls for agents that make professionals dramatically better at work they already do, especially repetitive and judgment-heavy workloads. citeturn437470view0
+The project targets creators, consultants, freelancers, independent makers and small professional teams. It is implemented around the Strands Agents SDK and designed for production evolution through Amazon Bedrock AgentCore Runtime, AgentCore Memory, AgentCore Gateway/MCP and A2A specialist agents. AWS documents AgentCore Runtime as a secure serverless environment that supports Strands and other frameworks, model flexibility, MCP and A2A communication. citeturn993163search3turn993163search6
 
-The prototype in this repository is deliberately judgeable without cloud credentials. It includes a working local orchestration core, a least-privilege action policy, evidence propagation, an approval gate, append-only audit logging, tests and an adapter for a real Strands/Bedrock execution path.
-
----
-
-## 2. Problem Statement
-
-Knowledge workers lose substantial attention not only to large tasks, but to the accumulation of small coordination tasks:
-
-- collecting status from scattered sources;
-- reading and classifying incoming information;
-- identifying what changed since the last review;
-- drafting routine follow-ups;
-- assembling progress reports;
-- detecting blockers before they become urgent;
-- deciding which items actually require the professional's attention.
-
-Conventional assistant interfaces often shift this coordination burden onto the user. The human must repeatedly open the assistant, supply context, inspect intermediate results and approve many low-value operations.
-
-This creates an **attention inversion**: the technology intended to reduce work becomes another system that must be managed.
-
-CogniSync addresses the inversion by making the agent responsible for background preparation while making the human the final authority over consequential actions.
+The submission is deliberately judgeable: the repository contains a deterministic local prototype, automated tests, explicit safety policy, provenance, audit logging, a human decision gate, a background heartbeat and a documented cloud evolution path. The repository was initially an empty/near-empty project scaffold; the implementation has now been expanded into a coherent, reproducible submission package. fileciteturn2file0L1-L2
 
 ---
 
-## 3. Target Beneficiaries
+## 2. Challenge and Opportunity
 
-The initial target audience is a solo or small-team professional operating in a high-context environment:
+Professionals rarely lose their day to one enormous task. They lose it to hundreds of small context switches: checking messages, collecting project status, remembering follow-ups, comparing the latest notes, drafting routine reports, finding missing dependencies and deciding what deserves attention.
 
-- photographers and other creative professionals managing client work;
-- consultants and freelancers coordinating deliverables;
-- small agencies managing multiple projects;
-- independent makers and service businesses handling repeated communication and reporting.
+Existing assistant products frequently invert the intended value proposition. The user must open the assistant, provide context, inspect intermediate steps, approve many actions and repeatedly ask what changed.
 
-These users often have enough digital tooling to generate data but not enough operational bandwidth to continuously synthesize it.
+CogniSync reverses this workflow:
 
-The product is designed to sit **above** those systems rather than replace them.
+**Signals → autonomous preparation → evidence → consequence gate → human decision**
 
----
+The user sees the outcome, not the machinery.
 
-## 4. Project Objectives
-
-### Objective 1 — Eliminate routine cognitive overhead
-
-Turn raw project signals into concise, evidence-backed work products without requiring repeated manual prompting.
-
-### Objective 2 — Preserve human agency
-
-Keep humans in control of external communication, publication, financial operations, destructive actions and other high-consequence effects.
-
-### Objective 3 — Make agent behavior inspectable
-
-Provide provenance, explicit policy decisions and an append-only audit trail for every meaningful workflow.
-
-### Objective 4 — Build a credible path from prototype to production
-
-Use Strands Agents as the agent orchestration layer and maintain compatibility with Amazon Bedrock AgentCore Runtime, Memory, Gateway/MCP and A2A as the production infrastructure.
-
-### Objective 5 — Measure usefulness and restraint together
-
-Do not optimize only for task completion. Measure the system's ability to know when it should act, when it should wait, and when it must ask.
+This directly matches the hackathon's published challenge: build an agent with Strands Agents SDK that handles repetitive work in the background and surfaces the human only when a real decision is needed. The Professional Agents track focuses on work such as scheduling, follow-ups and reporting. citeturn993163search1turn993163search8
 
 ---
 
-## 5. Technical Innovation
+## 3. Target Users
 
-CogniSync is organized around five architectural primitives.
+The initial product is optimized for high-context professionals working across several digital systems:
 
-### 5.1 Background Work Loop
+- photographers and other creative professionals managing multiple clients and deliverables;
+- consultants and freelancers coordinating projects, decisions and follow-ups;
+- small agencies handling reporting and client communication;
+- independent service businesses that accumulate administrative work faster than they can review it.
 
-The agent repeatedly performs:
-
-**ingest → interpret → synthesize → prepare → gate → surface**
-
-This creates a product experience in which the user interacts with outcomes, not with every internal step.
-
-### 5.2 Consequence-Aware Autonomy
-
-The action policy separates safe information work from externally consequential operations.
-
-The default posture is:
-
-- low-risk internal work: autonomous;
-- ambiguous or reversible internal actions: policy-dependent;
-- high-impact external actions: approval required;
-- unknown or unclassified side effects: fail closed.
-
-This is more defensible than a generic "autonomous agent" design because authorization is represented as a first-class system boundary rather than hidden inside prompting.
-
-### 5.3 Evidence-Carrying Decisions
-
-Every important insight carries source references and confidence. A human decision request therefore contains both the proposed action and the evidence supporting it.
-
-This reduces the cost of supervision: the user does not need to reconstruct why the system reached a conclusion.
-
-### 5.4 Context and Long-Term Personalization
-
-A production deployment can use AgentCore Memory for session continuity and long-term user preferences, semantic facts and session summaries. AWS documents these strategies as built-in AgentCore Memory capabilities. citeturn493810search3turn493810search4
-
-### 5.5 Bounded Multi-Agent Delegation
-
-A supervisor can delegate narrowly defined specialist work through A2A when it provides value. Strands supports A2A and an `A2AAgent` abstraction; AgentCore Runtime supports hosted A2A servers with standard discovery and JSON-RPC interactions. citeturn493810search0turn888617search0
-
-The design explicitly avoids uncontrolled agent swarms. Delegation is a capacity and specialization mechanism, not an aesthetic choice.
+The system is intentionally positioned above existing systems rather than replacing them. Its role is to synthesize their signals into a coherent operating layer.
 
 ---
 
-## 6. AWS and Strands Integration
+## 4. Product Vision
 
-The project is built around the Strands Agents SDK, which is the required framework for the hackathon. Strands is a library that runs in the application's own process and supports model-provider flexibility; Strands 1.0 introduced production-oriented multi-agent primitives and A2A support. citeturn493810search8turn888617search5
+CogniSync is a **professional attention-management agent**.
 
-For production hosting, Amazon Bedrock AgentCore Runtime is the target execution environment. AWS describes it as a secure, serverless, purpose-built environment that is framework-agnostic and supports MCP and A2A communication. citeturn888617search8
+The long-term experience is not a chat window waiting for prompts. It is a quiet operational layer that continuously prepares useful work and interrupts the user only when the expected consequence of waiting, approving or rejecting is meaningful.
 
-For tool access, AgentCore Gateway provides a managed MCP boundary and handles authentication and target invocation. citeturn493810search2turn493810search11
+The product is guided by five principles:
 
-For durable context, AgentCore Memory provides built-in strategies for user preferences, semantic memory and summaries. citeturn493810search3turn493810search4
-
-For evaluation, the Strands Evals ecosystem supports output/trajectory analysis, tool-use evaluation, trace-based evaluation, failure diagnosis, chaos testing and red-team evaluation. citeturn493810search9turn493810search6
-
----
-
-## 7. Prototype and Current State
-
-The repository now contains:
-
-1. a deterministic local orchestration engine;
-2. a Strands/Bedrock adapter;
-3. a project input store;
-4. a risk-aware autonomy policy;
-5. a human decision gate;
-6. append-only JSONL audit logging;
-7. a CLI for local demonstration;
-8. unit tests covering normal operation and safety gating;
-9. an architecture specification;
-10. a five-minute demonstration script;
-11. this grant proposal.
-
-This structure is intentionally stronger than a code-only proof of concept. A judge can run the system locally, inspect its decision logic, and understand the production architecture without being asked to trust claims that cannot be reproduced.
+1. **Background first.** Safe work should happen without prompting or notification noise.
+2. **Evidence before action.** Important claims carry provenance.
+3. **Least privilege.** Access and action scope are deliberately narrow.
+4. **Fail closed.** Unknown or consequential side effects are not executed implicitly.
+5. **Human attention by exception.** Human interaction is reserved for high-value decisions.
 
 ---
 
-## 8. Expected Impact
+## 5. Core Workflow
 
-CogniSync aims to create measurable improvements in the daily operating environment of professionals.
+The agent operates as a closed-loop system:
 
-### Primary impact
+### Step 1 — Observe
 
-Reduce the amount of human time spent collecting, sorting and preparing routine professional information.
+Ingest new signals from files, notes, email, CRM/project systems and future MCP-connected services.
 
-### Secondary impact
+### Step 2 — Interpret
 
-Improve consistency and timeliness of follow-ups and project reporting while preserving human review for consequential decisions.
+Classify inputs, detect change, identify dependencies and synthesize a current state.
 
-### Systemic impact
+### Step 3 — Prepare
 
-Demonstrate a practical design pattern for human-centered autonomy in which the optimization target is not maximum agent activity but maximum **useful work per unit of human attention**.
+Generate decision-ready summaries, blocker lists, reporting drafts and follow-up proposals.
+
+### Step 4 — Evaluate consequence
+
+Before any side effect, classify the requested operation through the action policy.
+
+### Step 5 — Act or wait
+
+Low-risk preparation proceeds. High-risk operations become explicit human decision requests. Unknown operations are treated as critical risk and remain blocked.
+
+### Step 6 — Learn and audit
+
+Record provenance and audit events, while the production memory layer learns stable preferences and relevant semantic context.
 
 ---
 
-## 9. Measurement Framework
+## 6. Technical Architecture
 
-The project will be evaluated using a balanced scorecard.
+```mermaid
+flowchart TB
+    S[Signals\nfiles • notes • email • CRM] --> M[MCP / Integration Adapters]
+    M --> G[Amazon Bedrock AgentCore Gateway]
+    G --> SUP[CogniSync Supervisor\nStrands Agents]
+    SUP <--> STM[Session Context]
+    SUP <--> LTM[AgentCore Memory]
+    SUP --> W[Bounded Specialist Workers\nA2A]
+    SUP --> E[Evidence / Provenance]
+    E --> P[Consequence Policy]
+    P -->|LOW| B[Background Safe Work]
+    P -->|MEDIUM| R[Policy-dependent Review]
+    P -->|HIGH| H[Human Decision Gate]
+    P -->|CRITICAL| X[Block + Escalate]
+    H -->|approved| O[External Effect]
+    B --> A[Audit / Telemetry]
+    H --> A
+    O --> A
+    X --> A
+    B --> K[Decision-ready Brief]
+    H --> K
+    K --> U[Professional / Human]
+```
 
-| Dimension | Measure | Desired direction |
+The architecture deliberately separates cognition from authorization. The agent can be correct about what should happen and still be prevented from doing it if the operation exceeds its authority.
+
+AgentCore Runtime currently supports long-running agent workloads, session isolation, framework and model flexibility, and MCP/A2A communication. citeturn993163search3turn993163search6 AgentCore Gateway provides a managed MCP boundary with inbound and outbound authorization mechanisms. citeturn903350search7turn903350search8
+
+---
+
+## 7. Strands Agents Foundation
+
+Strands is the primary orchestration framework because it is directly required by the hackathon and maps cleanly to the project's agent-loop model.
+
+The repository's live adapter uses a Bedrock model abstraction rather than hard-coding the entire product around a single provider. The current implementation already exposes `build_strands_agent()` as the cloud integration point. fileciteturn8file0L1-L6
+
+The production architecture should keep the deterministic policy and orchestration layer independent of any one model. This makes it possible to evaluate model substitutions against the same safety and usefulness criteria rather than treating provider selection as a product architecture decision.
+
+---
+
+## 8. Memory Architecture
+
+Professional workflows depend on continuity. A useful agent must know what is currently happening and remember stable context across sessions.
+
+The production design uses two conceptual layers:
+
+- **short-term/session memory** for the active workflow and current conversational context;
+- **long-term memory** for persistent preferences, semantic facts and compacted summaries.
+
+AWS documents AgentCore Memory strategies for semantic memory, user preferences and summarization, including integration with Strands. citeturn993163search5
+
+Memory is not treated as unrestricted authority. High-impact decisions must still carry current-run evidence so the human can inspect the immediate basis for the request.
+
+---
+
+## 9. Human-in-the-Loop and Consequence Control
+
+The central safety mechanism is the **consequence boundary**.
+
+CogniSync classifies actions as follows:
+
+| Risk | Examples | Default |
 |---|---|---|
-| Productivity | Minutes of repetitive work removed | Up |
-| Responsiveness | Input-to-decision-ready-brief latency | Down |
-| Attention | Human interventions per completed workflow | Down, without lowering quality |
-| Quality | Task success / acceptance rate | Up |
-| Grounding | Evidence coverage of important insights | Up |
-| Safety | Unsafe external actions executed | Zero |
-| Precision | Correct escalation rate | Up |
-| Efficiency | Cost per completed workflow | Down |
-| Resilience | Recovery after simulated tool failures | Up |
+| Low | read, classify, summarize, draft | autonomous |
+| Medium | reversible internal preparation | policy dependent |
+| High | send, publish, modify records, payment | human approval |
+| Critical | unknown capability, destructive action, privilege escalation | blocked + human decision |
+
+The repository already contains this fail-closed policy, including explicit high-impact actions and a critical fallback for unknown actions. fileciteturn7file0L1-L6
+
+The strengthened prototype now moves the approval mechanism into a dedicated `DecisionGate` so that policy, audit and resolution are explicit system components rather than incidental CLI behavior.
+
+Crucially, the local demo does **not** pretend that clicking approve sends a real message. The prototype proves the authorization transition; a real external connector remains a separate deployment concern.
 
 ---
 
-## 10. Evaluation and Red-Team Plan
+## 10. MCP and Integration Security
 
-The project will be evaluated against three classes of failure.
+AgentCore Gateway is the integration perimeter for future professional systems.
 
-### A. Over-automation
+The gateway supports MCP targets and multiple authorization strategies, including OAuth, IAM-based authorization and API-key credential providers. citeturn903350search1turn903350search8
 
-Examples: sending a message, publishing a document or changing a record without explicit authority.
+CogniSync therefore follows a strict principle:
 
-Success criterion: consequential actions are consistently intercepted by the policy gate.
+> **Credentials belong at the integration boundary, not in the model context.**
 
-### B. Under-automation
+The agent should receive the result of a successful tool invocation, not the secret used to obtain it.
 
-Examples: asking for approval for every low-risk read or drafting operation.
-
-Success criterion: safe repetitive work completes autonomously without notification spam.
-
-### C. Model / Tool Failure
-
-Examples: malformed tool result, timeout, duplicated input, partial context or adversarial instruction.
-
-Success criterion: the system fails safely, preserves auditability and does not silently invent completion.
-
-Strands Evals provides the appropriate foundation for trajectory, tool-use, trace, chaos and adversarial evaluation. citeturn493810search9turn493810search6
+The architecture also avoids treating a discovered remote resource as trustworthy by default. AWS specifically cautions that resource URIs can create SSRF or local-file access risks and recommends allowlisting trusted resource schemes and patterns. citeturn903350search9
 
 ---
 
-## 11. Security and Responsible AI
+## 11. Bounded Multi-Agent A2A
 
-CogniSync follows a least-privilege architecture.
+CogniSync will use A2A selectively rather than creating an uncontrolled swarm.
 
-Sensitive credentials should remain at the integration boundary rather than inside prompts. AgentCore Gateway is positioned as the managed MCP access layer. External side effects are classified explicitly. Unknown operations default to a critical-risk state.
+A supervisor may delegate narrow workloads such as:
 
-For shell execution, Strands Shell can provide a default-deny mediation layer for files and network access, but it should not be described as a hardened OS sandbox. Production deployment should rely on appropriate hosted isolation and IAM controls in the target environment. citeturn916868search1turn916868search6
+- document structure extraction;
+- classification;
+- report assembly;
+- quality review;
+- domain-specific analysis.
 
-The project also avoids synthetic certainty: the prototype distinguishes successful local computation from external real-world completion.
+AgentCore Runtime currently supports A2A servers, Agent Cards and JSON-RPC interaction; AWS documents Strands-based A2A deployment through `StrandsA2AExecutor` and `serve_a2a`. citeturn993163search2turn993163search7
+
+The architectural rule is simple: **delegate for measurable specialization, latency or cost benefit — not because more agents look more sophisticated.**
 
 ---
 
-## 12. Implementation Roadmap
+## 12. Prototype Status
 
-### Phase 1 — Hackathon prototype
+The repository now provides a reproducible local system rather than a documentation-only concept.
 
-Completed in the current repository:
+Current components include:
 
-- local background workflow;
-- policy engine;
-- evidence model;
-- audit log;
-- tests;
-- Strands integration adapter;
-- competition documentation.
+- deterministic project ingestion;
+- evidence-backed analysis;
+- risk-aware action policy;
+- centralized human decision gate;
+- append-only audit logging;
+- background heartbeat scheduler;
+- CLI interface and demo mode;
+- automated unit tests;
+- Strands/Bedrock adapter;
+- architecture and demonstration documentation;
+- this grant application.
 
-### Phase 2 — Cloud deployment
+The original project documentation already established the deterministic prototype and explicit distinction between local execution and a future cloud deployment. fileciteturn4file0L2-L6 The enhanced implementation builds on that foundation rather than claiming an AWS deployment that has not actually been provisioned.
 
-- deploy supervisor on AgentCore Runtime;
-- connect AgentCore Memory;
-- configure Gateway/MCP targets;
-- establish IAM boundaries;
-- add telemetry and trace correlation.
+---
 
-### Phase 3 — Workflow expansion
+## 13. Judgeability and Demo Design
 
-Initial professional workflows:
+The project is designed so that a reviewer can verify the core thesis in minutes.
 
-- daily project brief;
-- client follow-up preparation;
-- progress reporting;
-- blocker detection;
-- meeting-to-action extraction;
-- deliverable readiness checks.
+### Demo A — autonomous background work
+
+Run the local prototype against the synthetic project signal. The agent produces an evidence-backed result and does not generate an unnecessary human interruption.
+
+### Demo B — consequence boundary
+
+Request a real-world-looking external action such as a follow-up message. The system moves into `decision_required` and exposes the action, risk, reason and evidence.
+
+### Demo C — human resolution
+
+Resolve the decision in the local demo. The audit trail records the human choice. No external side effect is falsely claimed.
+
+The source input itself is synthetic and explicitly describes a project with pending accessibility checks, a final copy review, a launch target and a client request for a concise report. fileciteturn16file0L1-L6
+
+---
+
+## 14. Evaluation Framework
+
+CogniSync will be optimized for both **usefulness** and **restraint**.
+
+| Dimension | Metric | Goal |
+|---|---|---|
+| Productivity | Minutes of repetitive work removed | increase |
+| Responsiveness | Signal-to-decision brief latency | decrease |
+| Attention | Human interventions per workflow | decrease without quality loss |
+| Grounding | Important insights with evidence | increase |
+| Safety | Unauthorized external actions | zero |
+| Escalation | Correct high-impact escalation rate | increase |
+| Efficiency | Cost per completed workflow | decrease |
+| Reliability | Successful recovery after faults | increase |
+| Trust | Human acceptance of decision packets | increase |
+
+Evaluation scenarios will include normal workflows, ambiguous requests, prompt injection attempts, malformed tool results, duplicate events, tool timeouts, missing context and destructive-action requests.
+
+The Strands evaluation ecosystem provides capabilities relevant to trajectory, tool-use, trace, failure, chaos and adversarial testing. The project will use these classes of tests where supported by the deployed stack.
+
+---
+
+## 15. Responsible AI and Security
+
+CogniSync's security model is deliberately conservative.
+
+**No secret-in-prompt design.** Credentials remain in managed integration boundaries.
+
+**Fail-closed policy.** Unknown operations become critical risk.
+
+**Explicit authorization.** Consequential operations require human resolution.
+
+**Provenance.** Evidence is attached to important insights and decision requests.
+
+**Auditability.** Each run and decision transition is represented as machine-readable audit data.
+
+**Honest completion semantics.** The system must never claim that an external action occurred unless a real connector confirms the result.
+
+**Isolation claims remain precise.** Local mediation is not represented as an OS-level security boundary. Production isolation belongs in the hosted runtime and IAM architecture.
+
+---
+
+## 16. Innovation
+
+The innovation is not "an agent that can do more."
+
+It is an agent that can distinguish between:
+
+- work that should happen automatically;
+- work that should be prepared but not executed;
+- work that requires explicit authorization;
+- work that should be refused.
+
+This creates a new optimization target:
+
+### Useful work per unit of human attention
+
+Most agent systems optimize for task completion, tool-call success or maximum autonomy. CogniSync adds an equally important dimension: **how much supervisory attention does the system consume to achieve the result?**
+
+That makes restraint a measurable product feature.
+
+---
+
+## 17. Competitive Differentiation
+
+### Conventional assistant
+
+Human opens tool → supplies context → manages execution → approves steps → inspects result.
+
+### CogniSync
+
+System gathers context → works in background → synthesizes evidence → evaluates consequence → interrupts only when decision value is high.
+
+The distinction is therefore architectural and behavioral, not cosmetic.
+
+---
+
+## 18. Roadmap
+
+### Phase 1 — Submission-grade prototype
+
+Implemented in the repository:
+
+- local deterministic agent core;
+- safety and HITL boundary;
+- provenance and audit trail;
+- tests and demo flow;
+- Strands integration surface;
+- production architecture documentation.
+
+### Phase 2 — Cloud pilot
+
+Deploy the supervisor to AgentCore Runtime and connect durable memory. AgentCore's current runtime is explicitly designed for secure serverless agent hosting and supports Strands, MCP and A2A. citeturn993163search6
+
+### Phase 3 — Professional MCP integrations
+
+Start with narrowly scoped integrations for project communication, scheduling, file systems and reporting.
 
 ### Phase 4 — Specialist A2A workers
 
-Introduce specialized agents only where they create measurable gains in latency, quality or cost.
+Add only measured specializations that improve cost, latency or quality.
 
 ### Phase 5 — Continuous evaluation
 
-Run regression, fault-injection and red-team suites against each release and maintain an auditable baseline of safety and usefulness metrics.
+Run regression, adversarial and fault-injection suites on every meaningful release.
 
 ---
 
-## 13. Sustainability and Scalability
+## 19. Requested Grant Support
 
-The system is intentionally modular. The same cognitive core can process different professional workflows by changing the input adapters, domain policies and tool catalog rather than rebuilding the agent from scratch.
+Grant support would accelerate the project from a reproducible local prototype to a validated professional pilot.
 
-The architecture also preserves model flexibility. Strands is designed to work across supported model providers, while AgentCore Runtime is documented as model-flexible and framework-agnostic. citeturn493810search8turn888617search8
+Priority uses are:
 
-This enables a cost-aware routing model in which high-value reasoning can be handled by stronger models while repetitive bounded workloads can use less expensive alternatives, subject to evaluation gates.
+1. **Cloud execution and evaluation:** AgentCore Runtime, Memory, Gateway and telemetry.
+2. **Connector engineering:** narrowly scoped MCP integrations for real professional workflows.
+3. **Safety engineering:** adversarial testing, policy refinement, failure injection and evaluation infrastructure.
+4. **Pilot studies:** quantify time saved, notification reduction, intervention precision and user trust.
+5. **Open-source delivery:** reusable examples, integration templates and production documentation.
 
----
-
-## 14. Competitive Differentiation
-
-CogniSync is differentiated by its operating philosophy rather than by a larger collection of integrations.
-
-### Existing assistant paradigm
-
-Human opens system → provides context → supervises execution → receives result.
-
-### CogniSync paradigm
-
-System gathers context → performs safe background work → prepares evidence → waits at the consequence boundary → surfaces only the decision.
-
-The product therefore treats **human attention as the scarce resource**.
+The requested support is therefore tied to measurable technical and product milestones, not to speculative feature expansion.
 
 ---
 
-## 15. Why This Project Fits the Hackathon
+## 20. Hackathon Fit
 
-The hackathon asks for a new Strands-based AI agent that performs real work for people, especially repetitive work, and highlights background operation with human interaction only when meaningful decisions arise. CogniSync is designed specifically around that behavior and targets the Professional Agents track. citeturn437470view0
+The Agents for Humans Hackathon is running through **September 14, 2026 at 5:00 p.m. PDT**, with judging ending October 8 and winners announced October 14. It offers $40,000 in cash prizes, and the Professional Agents track targets automation of repetitive professional work such as scheduling, reporting and follow-up. citeturn993163search0turn993163search9
 
-The project also addresses the published evaluation criteria directly:
+CogniSync is aligned with the published challenge in five ways:
 
-- **Technical Implementation:** real executable prototype, Strands integration, safety policy, tests and a clear AgentCore production path;
-- **Design:** background-first user experience rather than a chatbot that requires constant operation;
-- **Potential Impact:** explicit target users, workflows and measurable outcomes;
-- **Creativity & Originality:** consequence-aware autonomy and attention optimization as the core design principle;
-- **Presentation:** a reproducible five-minute end-to-end demo narrative.
-
----
-
-## 16. Requested Support / Grant Use
-
-Grant support would accelerate the transition from the current reproducible prototype to a real-world professional pilot.
-
-Priority investment areas:
-
-1. **Cloud execution and evaluation** — AgentCore Runtime, memory, integration testing and telemetry.
-2. **Professional connectors** — carefully scoped MCP integrations for real workflows.
-3. **Safety and reliability engineering** — adversarial tests, chaos testing, policy refinement and evaluation infrastructure.
-4. **Pilot validation** — measuring time saved, intervention rates and user trust with professional users.
-5. **Open-source delivery** — documentation, reference integrations and reusable architecture patterns for other builders.
-
-The goal is not merely to demonstrate an agent that can act. The goal is to demonstrate a system that knows **what it can do autonomously, what it must ask, and why**.
+- **Technical implementation:** a real executable Strands-based prototype with a clear AgentCore production path;
+- **Design:** background-first operation and exception-based human interaction;
+- **Impact:** measurable reductions in routine coordination effort;
+- **Originality:** consequence-aware autonomy and human attention as an explicit optimization target;
+- **Presentation:** a short, reproducible demo in which the key behavior can be inspected rather than merely asserted.
 
 ---
 
-## 17. Final Statement
+## 21. Final Statement
 
-CogniSync Professional proposes a different contract between people and agents.
+CogniSync Professional proposes a practical contract between humans and autonomous agents:
 
-The agent should not demand more attention than the work it replaces.
+**Let the agent own the repetition. Let the human own the consequence.**
 
-It should absorb repetitive coordination, preserve evidence, learn stable working preferences, collaborate with specialist agents when useful, operate securely through controlled tool boundaries, and stop exactly where a human decision becomes meaningful.
+A professional should not have to become an operator of the system designed to save them time. CogniSync is built to absorb context collection, synthesis, drafting, classification and monitoring; preserve evidence; learn stable working preferences; collaborate through bounded specialist agents; and stop exactly where human judgment becomes materially important.
 
-That is the practical path toward human-centered autonomy: not removing humans from the loop, but removing humans from the parts of the loop that never needed them.
+The goal is not to remove humans from the loop.
+
+The goal is to remove humans from the parts of the loop that never required them.
