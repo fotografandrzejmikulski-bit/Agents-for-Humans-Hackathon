@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .audit import AuditLog
-from .models import DecisionRequest, RiskLevel
+from .models import DecisionRequest
 from .policy import AutonomyPolicy
 
 
@@ -22,7 +22,14 @@ class DecisionGate:
         self.policy = policy
         self.audit = audit
 
-    def request(self, *, action: str, reason: str, evidence: list[str], payload: dict[str, Any]) -> DecisionRequest | None:
+    def request(
+        self,
+        *,
+        action: str,
+        reason: str,
+        evidence: list[str],
+        payload: dict[str, Any],
+    ) -> DecisionRequest | None:
         decision = self.policy.gate(action, reason, evidence, payload)
         if decision is None:
             return None
@@ -34,7 +41,12 @@ class DecisionGate:
         )
         return decision
 
-    def resolve(self, decision: DecisionRequest, approved: bool, actor: str = "human") -> DecisionResolution:
+    def resolve(
+        self,
+        decision: DecisionRequest,
+        approved: bool,
+        actor: str = "human",
+    ) -> DecisionResolution:
         status = "approved" if approved else "rejected"
         event = "decision.approved" if approved else "decision.rejected"
         self.audit.record(event, action=decision.action, risk=str(decision.risk), actor=actor)
