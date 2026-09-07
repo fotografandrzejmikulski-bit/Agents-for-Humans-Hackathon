@@ -2,37 +2,44 @@
 
 > **A background professional agent that turns project noise into decision-ready work — without turning the human into the agent's operator.**
 
-CogniSync is a submission-ready prototype for the **Agents for Humans Hackathon 2026 — Professional Agents** track. The project follows the hackathon's central pattern: repetitive work happens in the background; the human is surfaced when a consequential decision actually matters. The submission deadline is **September 14, 2026 at 5:00 p.m. PDT**. citeturn993163search0turn993163search9
+CogniSync is a Strands Agents–based prototype for the **Agents for Humans Hackathon 2026 — Professional Agents** track. The design principle is explicit: **autonomy should absorb repetitive work while human attention is reserved for consequential decisions.**
 
-## The product idea
+## Why CogniSync
 
-Professional work generates a constant stream of low-value coordination: reading updates, identifying what changed, finding blockers, drafting reports, preparing follow-ups and deciding what deserves attention.
+Most assistants make the human operate the AI: open it, provide context, approve intermediate actions, and repeatedly ask for status.
 
-CogniSync inverts the normal assistant relationship:
+CogniSync reverses the relationship:
 
-**Signals → background reasoning → evidence → consequence policy → human decision**
+**observe → interpret → prepare → evaluate consequence → act or wait → surface**
 
-The agent owns repetition. The human owns consequence.
+The agent works quietly. The human receives a compact decision packet only when attention has actual value.
 
-## What is implemented
+## The core promise
 
-- deterministic local background workflow;
-- evidence-backed project analysis;
-- explicit least-privilege risk policy;
-- centralized Human-in-the-Loop decision gate;
-- fail-closed handling of unknown actions;
-- append-only JSONL audit trail;
-- provenance hashing for source records;
-- background heartbeat scheduler;
-- CLI and five-minute judgeable demo;
-- Strands/Bedrock adapter;
-- automated tests and CI;
-- AgentCore-oriented architecture documentation;
-- professional English grant application.
+CogniSync does four things especially well:
 
-The repository contains a runnable local core so judges do not need cloud credentials to inspect the system's central behavior. The cloud path is explicitly documented rather than falsely presented as already provisioned. fileciteturn4file0L2-L6
+- **Background work:** reads and synthesizes project signals without requiring constant prompting.
+- **Evidence-backed intelligence:** important insights retain source references and confidence.
+- **Consequence-aware autonomy:** safe work is autonomous; external or destructive effects require authorization.
+- **Auditability:** important transitions are recorded as structured events.
 
-## Quick start
+The prototype is intentionally honest about scope: local execution is fully reproducible; cloud integrations are production architecture targets rather than claims of already-provisioned infrastructure.
+
+## What the prototype demonstrates
+
+The repository contains a deterministic local core that can:
+
+1. load synthetic project information;
+2. analyze it into evidence-backed insights;
+3. produce a decision-ready background brief;
+4. detect requests for consequential actions;
+5. classify the requested action through a model-independent policy;
+6. fail closed for unknown side effects;
+7. create a human decision request;
+8. record the workflow in an append-only JSONL audit trail;
+9. simulate approval without pretending that a real-world action occurred.
+
+## Run it
 
 ```bash
 python -m venv .venv
@@ -42,162 +49,139 @@ pytest -q
 python -m cognisync --pretty
 ```
 
-The package is directly executable through `python -m cognisync`.
+The judge-friendly end-to-end scenario is:
 
-## Prove the safety boundary
+```bash
+python -m scripts.demo
+```
+
+To explicitly exercise the external-action gate:
 
 ```bash
 python -m cognisync --demo-gate --pretty
 ```
 
-Expected behavior:
-
-```text
-status: decision_required
-risk: high
-action: send_external_message
-```
-
-Nothing is sent. The decision packet contains the proposed action, reason, evidence and payload context.
-
-Resolve the local demo transition:
-
-```bash
-python -m cognisync --demo-gate --approve --pretty
-```
-
-Approval records the decision in the audit trail. The prototype still does not fake external completion.
+The system must return `decision_required`; no real external message is sent by the local prototype.
 
 ## Architecture
 
 ```mermaid
 flowchart TB
-    S[Project signals\nfiles • notes • email • CRM] --> M[MCP / integration adapters]
-    M --> G[AgentCore Gateway]
+    S[Project signals\nemail • notes • files • CRM] --> M[MCP / Integration Adapters]
+    M --> G[AgentCore Gateway / MCP boundary]
     G --> SUP[CogniSync Supervisor\nStrands Agents]
-    SUP <--> MEM[Session + long-term memory]
-    SUP --> A2A[Bounded specialist agents\nA2A]
-    SUP --> EV[Evidence / provenance]
-    EV --> P[Consequence policy]
-    P -->|LOW| BG[Background safe work]
-    P -->|MEDIUM| RV[Policy review]
-    P -->|HIGH| HITL[Human Decision Gate]
-    P -->|CRITICAL| BL[Block + escalate]
-    HITL -->|approved| FX[External effect]
-    BG --> AUD[Audit / telemetry]
-    HITL --> AUD
-    FX --> AUD
-    BL --> AUD
-    BG --> OUT[Decision-ready brief]
-    HITL --> OUT
-    OUT --> H[Professional]
+    SUP <--> STM[Session context]
+    SUP <--> LTM[AgentCore Memory]
+    SUP --> A2A[Bounded specialist workers\nA2A]
+    SUP --> E[Evidence / Provenance]
+    E --> P[Consequence-aware Policy]
+    P -->|LOW| B[Background safe work]
+    P -->|HIGH / CRITICAL| H[Human decision gate]
+    H -->|approved| X[External side effect]
+    B --> O[Decision-ready output]
+    H --> O
+    SUP --> AU[Audit / telemetry]
 ```
 
-Amazon Bedrock AgentCore Runtime is designed for secure serverless agent execution, with support for Strands and other frameworks, model flexibility, MCP and A2A. AgentCore Gateway provides the managed MCP integration boundary and supports inbound/outbound authorization. citeturn993163search6turn903350search7turn903350search8
+The production architecture is designed around Strands Agents, Amazon Bedrock AgentCore Runtime, AgentCore Memory, AgentCore Gateway/MCP and optional A2A specialist workers. The repository deliberately keeps the policy boundary independent of the model so a model output never becomes authorization by itself.
 
-AWS also documents AgentCore-hosted A2A servers using `StrandsA2AExecutor` and `serve_a2a`, with Agent Cards and JSON-RPC. citeturn993163search2turn993163search7
+## Safety invariants
 
-## Memory strategy
+- Unknown actions are **critical risk** and never auto-execute.
+- External communication, publication, CRM/calendar changes, payments and destructive operations require approval.
+- The model is not the authorization layer.
+- External completion must be confirmed by the connector before it is reported as complete.
+- Credentials do not belong in prompts or repository files.
+- Local demo data is synthetic.
 
-The production design separates active session context from durable knowledge. AgentCore Memory currently documents built-in strategies for semantic memory, user preferences and summarization, including Strands integration. citeturn993163search5
+See [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) for the trust boundaries and residual risk assumptions.
 
-Memory is contextual support, not authorization. Every consequential decision still carries current-run evidence.
+## Evaluation philosophy
 
-## Security model
+CogniSync is evaluated on both **usefulness** and **restraint**.
 
-CogniSync uses a **fail-closed consequence taxonomy**:
-
-| Risk | Examples | Default |
-|---|---|---|
-| Low | read, classify, summarize, draft | autonomous |
-| Medium | reversible internal preparation | policy-dependent |
-| High | send, publish, modify records, payment | human approval |
-| Critical | unknown, destructive, privilege escalation | block + escalate |
-
-This policy was part of the original repository foundation and remains explicit in the code. fileciteturn7file0L1-L6
-
-AgentCore Gateway supports OAuth, IAM and API-key authorization patterns. For remote resource reads, AWS warns about SSRF/local-file risks and recommends allowlisting trusted resource URI schemes and patterns. citeturn903350search1turn903350search9
-
-For shell execution, any local mediation layer must not be described as an OS-level security boundary. Production isolation belongs in the hosted execution environment and IAM model.
-
-## Evaluation
-
-CogniSync is evaluated on both **usefulness and restraint**:
-
-| Metric | Direction |
+| Dimension | Question |
 |---|---|
-| repetitive minutes removed | up |
-| signal-to-brief latency | down |
-| unnecessary interventions | down |
-| important claims with evidence | up |
-| unauthorized external actions | zero |
-| correct high-impact escalation | up |
-| cost per workflow | down |
-| fault recovery | up |
+| Task success | Did the agent prepare the right work product? |
+| Evidence coverage | Can an important claim be traced to source material? |
+| Safe autonomy | Did routine work complete without needless approval? |
+| Escalation precision | Did consequential work stop at the correct boundary? |
+| Safety | Was any unauthorized side effect executed? |
+| Resilience | Did failure produce a safe, inspectable state? |
+| Efficiency | What useful work was produced per unit of model/human cost? |
 
-The test suite covers normal analysis, safety classification, human decision resolution and audit behavior. The architecture also supports a broader adversarial program including prompt injection, malformed tool output, duplicate events, missing context and timeout recovery.
+The release matrix is in [`docs/EVALUATION_MATRIX.md`](docs/EVALUATION_MATRIX.md).
+
+## Production evolution
+
+The next deployment stages are:
+
+1. **Local judgeable core** — deterministic and testable without AWS credentials.
+2. **Real Strands / Bedrock execution** — configurable model adapter.
+3. **AgentCore Runtime** — hosted background execution.
+4. **AgentCore Memory** — session continuity and durable preference/semantic context.
+5. **AgentCore Gateway / MCP** — controlled integration boundary for professional tools.
+6. **A2A specialists** — bounded delegation where measurable value exists.
+7. **Continuous evaluation** — regression, adversarial and fault-injection suites.
+
+Production deployment should use current AWS/Strands tooling and pin the exact SDK/CLI versions used by the target environment rather than relying on stale examples.
 
 ## Repository map
 
 ```text
 .
 ├── cognisync/
-│   ├── agent.py          # Strands / Bedrock adapter
-│   ├── analysis.py       # deterministic signal extraction
-│   ├── audit.py          # append-only audit events
-│   ├── cli.py            # executable prototype interface
-│   ├── decision.py       # centralized human decision gate
-│   ├── engine.py         # background orchestration
-│   ├── evidence.py       # provenance records / content hashes
-│   ├── heartbeat.py      # background scheduler
-│   ├── models.py         # domain types + risk levels
-│   ├── policy.py         # fail-closed authorization policy
-│   └── store.py          # local persistence adapter
-├── data/brief.json       # synthetic demo signal
+│   ├── agent.py           # optional Strands/Bedrock adapter
+│   ├── analysis.py        # deterministic signal analysis
+│   ├── audit.py           # append-only audit events
+│   ├── cli.py             # command-line entry point
+│   ├── config.py          # environment configuration
+│   ├── decision.py        # human decision gate
+│   ├── engine.py          # background orchestration
+│   ├── evidence.py        # provenance helpers
+│   ├── health.py          # health/readiness helper
+│   ├── heartbeat.py       # background heartbeat abstraction
+│   ├── models.py          # domain models
+│   ├── policy.py          # fail-closed action policy
+│   └── store.py            # replaceable local persistence
+├── data/
+│   └── brief.json         # synthetic demonstration input
 ├── docs/
 │   ├── ARCHITECTURE.md
+│   ├── BUILD_NOTES.md
 │   ├── DEMO.md
 │   ├── DEMO_SCENARIO_V2.md
+│   ├── DEMO_SCENARIO.md
+│   ├── DEMO_SCRIPT.md
+│   ├── EVALUATION_MATRIX.md
 │   ├── GRANT_PROPOSAL.md
-│   └── ...
+│   ├── SUBMISSION_CHECKLIST_V2.md
+│   ├── SUBMISSION_CHECKLIST.md
+│   └── THREAT_MODEL.md
+├── scripts/
+│   └── demo.py            # one-command judge demo
 ├── tests/
 ├── .github/workflows/ci.yml
 ├── LICENSE
-├── pyproject.toml
-└── README.md
+└── pyproject.toml
 ```
 
-## Production path
+## Submission package
 
-The intended cloud progression is:
+- [`docs/GRANT_PROPOSAL.md`](docs/GRANT_PROPOSAL.md) — full professional English application.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — technical architecture and deployment progression.
+- [`docs/DEMO_SCENARIO_V2.md`](docs/DEMO_SCENARIO_V2.md) — five-minute demo narrative.
+- [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) — threat model and security invariants.
+- [`docs/EVALUATION_MATRIX.md`](docs/EVALUATION_MATRIX.md) — release and red-team gates.
+- [`docs/SUBMISSION_CHECKLIST_V2.md`](docs/SUBMISSION_CHECKLIST_V2.md) — submission readiness checklist.
 
-1. Strands supervisor in AgentCore Runtime;
-2. AgentCore Memory for session continuity and durable personalization;
-3. AgentCore Gateway for authenticated MCP tools;
-4. bounded specialist workers over A2A;
-5. telemetry and continuous evaluation.
+## Integrity statement
 
-AWS currently documents `agentcore create` and `agentcore deploy` as official project/deployment workflows. For A2A, the documented runtime contract uses a streamable HTTP server on port 9000. citeturn993163search2
+This repository distinguishes three states that must never be conflated:
 
-## Submission alignment
+**prepared** ≠ **authorized** ≠ **executed**
 
-The hackathon is a public Devpost event with a **$40,000 cash prize pool**. The Professional Agents track is specifically aimed at repetitive professional tasks such as scheduling, follow-ups and reporting. citeturn993163search1turn993163search8
-
-CogniSync is designed around the judging dimensions implied by the event:
-
-- **Technical implementation:** runnable agent core, Strands integration point, tests, safety policy, AgentCore architecture;
-- **Design:** background-first and exception-driven human interaction;
-- **Potential impact:** measurable reduction in coordination overhead;
-- **Creativity:** consequence-aware autonomy and human attention as a design objective;
-- **Presentation:** short reproducible demo with observable safety behavior.
-
-## Grant proposal
-
-The full professional English proposal is maintained in [`docs/GRANT_PROPOSAL.md`](docs/GRANT_PROPOSAL.md).
-
-## Demo
-
-The complete five-minute narrative is in [`docs/DEMO_SCENARIO_V2.md`](docs/DEMO_SCENARIO_V2.md). It demonstrates the central thesis without pretending that a local approval created a real-world side effect.
+That distinction is central to the product. CogniSync is not trying to maximize the number of actions taken by an agent. It is trying to maximize useful work completed while minimizing the amount of human attention required to supervise it.
 
 ## License
 
