@@ -8,13 +8,17 @@ from .models import DecisionRequest, RiskLevel
 
 @dataclass(frozen=True, slots=True)
 class AutonomyPolicy:
-    """Determines whether an operation can execute without human approval."""
+    """Model-independent capability authorization policy.
+
+    The policy evaluates the requested capability, never the model's confidence.
+    Unknown capabilities are critical by design and cannot be auto-executed.
+    """
 
     safe_actions: frozenset[str]
     approval_actions: frozenset[str]
 
     def classify(self, action: str) -> RiskLevel:
-        normalized = action.strip().lower()
+        normalized = self.normalize(action)
         if normalized in self.safe_actions:
             return RiskLevel.LOW
         if normalized in self.approval_actions:
@@ -24,16 +28,32 @@ class AutonomyPolicy:
     def requires_approval(self, action: str) -> bool:
         return self.classify(action) in {RiskLevel.HIGH, RiskLevel.CRITICAL}
 
-    def gate(self, action: str, reason: str, evidence: list[str], payload: dict) -> DecisionRequest | None:
-        if not self.requires_approval(action):
+    def gate(
+        self,
+        action: str,
+        reason: str,
+        evidence: list[str],
+        payload: dict,
+    ) -> DecisionRequest | None:
+        normalized = self.normalize(action)
+        risk = self.classify(normalized)
+        if risk is RiskLevel.LOW:
             return None
+        from uuid import uuid4
+        from .models import DecisionStatus
         return DecisionRequest(
-            action=action,
+            decision_id=str(uuid4()),
+            action=normalized,
             reason=reason,
-            risk=self.classify(action),
-            evidence=evidence,
-            proposed_payload=payload,
+            risk=risk,
+            evidence=list(evidence),
+            proposed_payload=dict(payload),
+            status=DecisionStatus.PENDING,
         )
+
+    @staticmethod
+    def normalize(action: str) -> str:
+        return "_".join(action.strip().lower().split())
 
 
 SAFE_ACTIONS: Final = frozenset(
