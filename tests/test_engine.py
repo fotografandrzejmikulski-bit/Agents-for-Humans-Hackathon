@@ -3,6 +3,7 @@ import json
 from cognisync.audit import AuditLog
 from cognisync.engine import CogniSyncEngine
 from cognisync.models import ProjectItem
+from cognisync.policy import DEFAULT_POLICY
 from cognisync.store import ProjectStore
 
 
@@ -35,12 +36,6 @@ def test_engine_emits_gate_for_external_action(tmp_path) -> None:
     assert any(event["event"] == "decision.requested" for event in events)
 
 
-def test_unknown_side_effects_fail_closed(tmp_path) -> None:
-    data = tmp_path / "data"
-    audit = AuditLog(data / "audit.jsonl")
-    result = CogniSyncEngine(ProjectStore(data), audit).run(
-        "invoke unknown_side_effect",
-        [ProjectItem("1", "notes", "Unknown", "Review this instruction.")],
-    )
-    assert result.status == "completed"
-    assert result.decision_request is None
+def test_unknown_action_policy_fails_closed() -> None:
+    assert DEFAULT_POLICY.requires_approval("unknown_side_effect") is True
+    assert DEFAULT_POLICY.classify("unknown_side_effect").value == "critical"
