@@ -10,12 +10,18 @@ from .decision import DecisionGate
 from .models import Insight, ProjectItem, RunResult
 from .policy import DEFAULT_POLICY, AutonomyPolicy
 from .store import ProjectStore
+from .verification import VerificationResult, verify_insights
 
 
 class CogniSyncEngine:
-    """Background-first orchestration core with an explicit consequence boundary."""
+    """Background-first orchestration core with explicit verification and consequence boundaries."""
 
-    def __init__(self, store: ProjectStore, audit: AuditLog, policy: AutonomyPolicy = DEFAULT_POLICY) -> None:
+    def __init__(
+        self,
+        store: ProjectStore,
+        audit: AuditLog,
+        policy: AutonomyPolicy = DEFAULT_POLICY,
+    ) -> None:
         self.store = store
         self.audit = audit
         self.policy = policy
@@ -32,13 +38,21 @@ class CogniSyncEngine:
             return RunResult(run_id, "idle", summary, [], audit_events=[])
 
         insights, evidence = analyze_items(sources)
+        verification: VerificationResult = verify_insights(insights, evidence)
         self.audit.record(
             "analysis.completed",
             run_id=run_id,
             source_count=len(sources),
             insight_count=len(insights),
             evidence_count=len(evidence),
+            verification_status=verification.status,
+            verification_errors=verification.errors,
         )
+
+        if not verification.passed:
+            summary = "The agent produced candidate insights but did not promote them because verification failed."
+            self.audit.record("run.completed", run_id=run_id, status="verification_failed")
+            return RunResult(run_id, "verification_failed", summary, [], audit_events=[])
 
         decision_request = None
         requested_action = self._requested_action(request)
@@ -78,7 +92,10 @@ class CogniSyncEngine:
 
     @staticmethod
     def _summary(items: list[ProjectItem], insights: list[Insight], decision_request: Any) -> str:
-        base = f"CogniSync processed {len(items)} inputs in background mode and produced {len(insights)} evidence-backed insight(s)."
+        base = (
+            f"CogniSync processed {len(items)} inputs in background mode and produced "
+            f"{len(insights)} verified evidence-backed insight(s)."
+        )
         if decision_request:
             return base + f" A human decision is required before {decision_request.action} can proceed."
         return base + " No consequential side effect was authorized or executed."
