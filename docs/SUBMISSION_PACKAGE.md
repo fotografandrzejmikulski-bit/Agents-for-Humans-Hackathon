@@ -2,7 +2,7 @@
 
 ## 1. One-sentence thesis
 
-**CogniSync is a background-first professional agent that removes repetitive coordination work, preserves evidence, and interrupts the human only when a consequential decision requires human authority.**
+**CogniSync is a background-first professional agent that removes repetitive coordination work, verifies evidence, and interrupts the human only when a consequential decision requires human authority.**
 
 ## 2. What is actually implemented
 
@@ -10,12 +10,14 @@ The repository contains:
 
 - deterministic local signal ingestion;
 - evidence-backed analysis;
+- explicit output verification before promotion;
 - risk classification through a model-independent policy;
 - explicit decision requests for consequential actions;
-- append-only audit events;
+- single-use human decision lifecycle;
+- tamper-evident, hash-chained audit events;
 - a background heartbeat abstraction;
 - CLI and one-command demo flow;
-- automated tests;
+- automated regression tests;
 - a Strands/Bedrock integration surface.
 
 ## 3. What is architecture / roadmap
@@ -42,7 +44,7 @@ Run:
 python -m cognisync --pretty
 ```
 
-Show that the system produces a compact brief with evidence without requiring intermediate human supervision.
+Show that the system produces a compact, verified brief with evidence without requiring intermediate human supervision.
 
 ### 2:00–3:20 — Consequence boundary
 
@@ -52,7 +54,7 @@ Run:
 python -m cognisync --demo-gate --pretty
 ```
 
-Show `decision_required` and inspect action, risk, reason, evidence and proposed payload.
+Show `decision_required` and inspect the decision ID, action, risk, reason, evidence and proposed payload.
 
 ### 3:20–4:15 — Human authorization
 
@@ -62,7 +64,7 @@ Run:
 python -m cognisync --demo-gate --approve --pretty
 ```
 
-Then inspect the JSONL audit event. State explicitly that the local demo records authorization but does not claim a real external side effect.
+Then inspect the JSONL audit trail. State explicitly that the local demo records authorization but does not claim a real external side effect.
 
 ### 4:15–5:00 — Why it matters
 
@@ -70,7 +72,25 @@ Close with:
 
 > Most agent demos measure what the agent can do. CogniSync also measures when it should stop. The product is optimized for useful work per unit of human attention.
 
-## 5. Judge questions the repository should answer
+## 5. Safety proof sequence
+
+Run the automated tests:
+
+```bash
+pytest -q
+```
+
+The suite covers:
+
+- safe autonomy;
+- high-risk escalation;
+- critical unknown-action handling;
+- single-use decision lifecycle;
+- execution only after approval;
+- verification failures;
+- audit-chain integrity and tamper detection.
+
+## 6. Judge questions the repository should answer
 
 ### Is this autonomous?
 
@@ -78,7 +98,7 @@ Yes, for routine local analysis and preparation. It does not require the human t
 
 ### Is this safe?
 
-Safety is represented as a system property: unknown actions fail closed, consequential operations require explicit authorization, and external completion is only reported after connector confirmation.
+Safety is represented as a system property: unknown actions fail closed, consequential operations require explicit authorization, verified outputs are promoted, and external completion is only recorded after connector confirmation.
 
 ### Is this really an agent?
 
@@ -88,7 +108,7 @@ The deterministic core demonstrates the control flow and the repository includes
 
 Because authorization and capability are different properties. A system can be technically capable of an action while still being unauthorized to take it.
 
-## 6. Evidence ladder
+## 7. Evidence ladder
 
 | Claim type | How to treat it |
 |---|---|
@@ -98,7 +118,7 @@ Because authorization and capability are different properties. A system can be t
 | Third-party capability | Verify against current provider documentation |
 | External side effect | Never claim completion without connector confirmation |
 
-## 7. Success metrics
+## 8. Success metrics
 
 Primary:
 
@@ -115,7 +135,7 @@ Secondary:
 - recovery success;
 - user acceptance of decision packets.
 
-## 8. Submission integrity
+## 9. Submission integrity
 
 This package intentionally separates:
 
