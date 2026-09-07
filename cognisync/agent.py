@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import os
 from typing import Any
+
+from .config import Settings
 
 try:
     from strands import Agent
@@ -21,14 +22,14 @@ Prefer concise evidence-backed outputs and preserve provenance for important cla
 
 
 def build_strands_agent() -> Any:
-    """Build the real Strands agent when the runtime dependencies are installed."""
+    """Build the real Strands/Bedrock agent when optional dependencies are installed."""
     if Agent is None or BedrockModel is None:
         raise RuntimeError("Install the project with the 'aws' extra or install strands-agents.")
 
-    model_id = os.getenv("COGNISYNC_MODEL_ID", "amazon.nova-pro-v1:0")
+    settings = Settings.from_env()
     model = BedrockModel(
-        model_id=model_id,
-        temperature=float(os.getenv("COGNISYNC_TEMPERATURE", "0.2")),
+        model_id=settings.model_id,
+        temperature=settings.temperature,
         streaming=True,
     )
     return Agent(model=model, system_prompt=SYSTEM_PROMPT)
