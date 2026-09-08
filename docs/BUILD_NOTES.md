@@ -2,7 +2,7 @@
 
 ## Source baseline
 
-The starting material described CogniSync as a background multi-agent system using Strands Agents, Amazon Bedrock AgentCore Runtime, AgentCore Memory, MCP/Gateway, A2A and Human-in-the-Loop. It also proposed a Python prototype with memory/session management and a CLI-oriented deployment path. The concept is retained, but the implementation is made more conservative and reproducible.
+The supplied material described CogniSync as a background multi-agent system using Strands Agents, Amazon Bedrock AgentCore Runtime, AgentCore Memory, MCP/Gateway, A2A and Human-in-the-Loop. It also proposed a Python prototype with memory/session management and a CLI-oriented deployment path. The concept is retained, but the implementation is intentionally more conservative and reproducible.
 
 ## Improvements made
 
@@ -12,7 +12,7 @@ The repository does not claim that an AWS resource exists merely because code is
 
 ### 2. Made autonomy a first-class policy
 
-The policy engine is independent from the model. Low-risk work is autonomous; high-risk and unknown actions fail closed.
+The policy engine is independent from the model. Low-risk work is autonomous; high-risk and unknown capabilities fail closed.
 
 ### 3. Added a deterministic local mode
 
@@ -20,20 +20,32 @@ Judges can execute the core without AWS credentials. This lowers the barrier to 
 
 ### 4. Added evidence and auditability
 
-Insights carry source references and confidence. Runs and decision gates are logged in JSONL.
+Insights carry source references and bounded confidence. Runs and decision gates are recorded in an append-only JSONL audit stream with hash chaining.
 
 ### 5. Added explicit threat model
 
-Prompt injection, privilege, credential exposure, hallucinated completion, context poisoning and runaway execution are treated as system design concerns rather than prompt-only concerns.
+Prompt injection, privilege escalation, credential exposure, hallucinated completion, context poisoning and runaway execution are treated as system design concerns rather than prompt-only concerns.
 
-### 6. Updated security framing
+### 6. Kept production security claims proportional to the evidence
 
-Current Strands Shell documentation distinguishes an in-process mediation layer from hardened OS isolation. Production isolation should therefore be attributed to the appropriate runtime boundary rather than overstated. citeturn916868search1turn916868search6
+The local prototype demonstrates policy enforcement, verification and tamper-evident audit logging. Production isolation and connector hardening remain deployment responsibilities and are not represented as already completed.
 
-### 7. Updated AWS architecture references
+### 7. Kept cloud architecture claims proportional to implementation state
 
-Current AWS documentation supports AgentCore Runtime as a framework-agnostic execution environment, AgentCore Gateway as an MCP integration boundary, AgentCore Memory built-in strategies, and A2A server deployment with Agent Cards and JSON-RPC. citeturn888617search8turn493810search2turn493810search4turn888617search0
+The repository documents a production path around Strands Agents, Amazon Bedrock AgentCore and bounded tool/agent protocols, but does not present future integrations as currently provisioned infrastructure.
 
 ## Important implementation note
 
-The exact production APIs and CLI parameters should be pinned and validated in the deployment environment before a cloud rollout. The repository intentionally avoids encoding unverified legacy snippets as if they were guaranteed current interfaces.
+Exact production APIs, IAM configuration, network boundaries, connector contracts and runtime parameters must be pinned and validated in the target deployment environment before cloud rollout. The repository intentionally avoids encoding unverified legacy snippets as guaranteed current interfaces.
+
+## Evidence classification
+
+Public documentation should use four states consistently:
+
+`implemented` → visible and testable now.
+
+`contract` → enforced behavior or interface, without implying a real external integration.
+
+`roadmap` → planned production work not yet demonstrated by the repository.
+
+`hypothesis` → measurable proposition requiring empirical evaluation.
