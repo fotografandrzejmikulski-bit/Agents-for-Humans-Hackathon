@@ -1,138 +1,142 @@
-# CogniSync Professional + Sovereign AI Project Portfolio
+# CogniSync Professional
 
-> **A background-first agent system and applied AI portfolio that turns project noise into decision-ready work — while keeping the human in control of consequences.**
+> **A background-first professional agent that owns repetitive coordination work while humans retain authority over consequential decisions.**
 
-This repository began as a minimal/near-empty hackathon scaffold and has been expanded into a coherent engineering portfolio. fileciteturn2file0L1-L2
+**Grant submission repository — Agents for Humans Hackathon 2026**
 
-## Flagship project — CogniSync Professional
+**Applicant:** Andrzej Mikulski  
+**Track:** Professional Agents  
+**Primary artifact:** `cognisync/`  
+**Grant proposal:** [`docs/GRANT_PROPOSAL.md`](docs/GRANT_PROPOSAL.md)
 
-CogniSync is a Strands Agents–based professional agent for background coordination work.
+---
 
-**observe → interpret → prepare → evaluate consequence → act or wait → surface → audit**
+## The thesis
 
-The local prototype demonstrates autonomous background analysis, source-backed insights, a model-independent consequence policy, human decision gates, fail-closed handling of unknown operations, append-only audit events, a Strands/Bedrock adapter, automated tests and CI, plus a documented path to AgentCore Runtime, Memory, Gateway/MCP and A2A.
+> **Let the agent own the repetition. Let the human own the consequence.**
 
-The key system boundary is explicit: **model capability is not authorization**.
+CogniSync is designed for professionals who are overloaded by coordination work rather than by the absence of another chat interface. It runs a controlled workflow:
 
-## Portfolio derived from the supplied research corpus
+`observe → interpret → verify → prepare → evaluate consequence → act or wait → audit`
 
-The uploaded materials contain several strong technical and product directions. They are now organized as buildable projects rather than remaining disconnected notes:
+The key authorization invariant is:
 
-| Project | Role | State |
-|---|---|---|
-| **01 — CogniSync Professional** | Background professional agent | Prototype |
-| **02 — Sovereign Edge Agent** | Local AI execution substrate | Architecture + benchmark plan |
-| **03 — Open Creator Layer** | Buildbox-class creation UX over Unity/Unreal | MVP design |
-| **04 — Influence Literacy Lab** | Defensive analysis of persuasive systems | Research product |
-| **05 — AI Content Product Studio** | Productized content-production workflows | Product design |
+`prepared ≠ authorized ≠ executed`
 
-See [`projects/00-portfolio/PROJECT_PORTFOLIO.md`](projects/00-portfolio/PROJECT_PORTFOLIO.md).
+Routine read/analyze/prepare work can remain autonomous. Consequential operations require an explicit decision request. Unknown capabilities fail closed.
 
-## Project 02 — Sovereign Edge Agent
+## What this repository proves today
 
-The supplied local-AI material describes Gemma 3 27B on RTX 3070-class hardware, GGUF Q4_K_M, CPU/GPU offloading, local Deep Search, Rclone-backed Google Drive, MCP and a neuro-symbolic verification loop. The source recommends starting points such as 18–20 GPU layers and 16k–32k context on 32 GB RAM; those figures are intentionally treated as **benchmark hypotheses**, not guarantees. fileciteturn69file6L258-L289
+The public prototype is deterministic and runnable without cloud credentials. It demonstrates:
 
-The supplied documents also propose syntax/lint/sandbox verification plus bounded self-correction for generated code. fileciteturn68file12L534-L555
+- evidence-backed insight generation;
+- verification gates before work is promoted;
+- model-independent autonomy policy;
+- human decision requests for consequential capabilities;
+- single-use approval/rejection transitions;
+- prevention of execution before approval;
+- tamper-evident hash-chained audit events;
+- automated tests for positive and failure paths;
+- a local demo that never pretends to perform a real external side effect.
 
-The project strengthens these ideas with:
+The Strands/Bedrock integration is an adapter and production path, not a claim that cloud resources are already provisioned.
 
-`model → typed tools → policy → verification → human gate → audit`
-
-## Project 03 — Open Creator Layer
-
-The Buildbox analysis proposes an **Engine-on-Engine** strategy: retain Unity/Unreal as the underlying rendering/runtime platform while providing a much simpler creator UX. It identifies Mind Map navigation, visual scripting, Smart Assets, build automation and monetization abstraction as core experience pillars. fileciteturn66file1L50-L69
-
-The project therefore centers on a typed graph, engine-independent project model, native engine adapters, compiler/validator and AI-assisted authoring.
-
-## Project 04 — Influence Literacy & Ethical Communication Lab
-
-The influence corpus covers reciprocity, social proof, attention capture, gaze cueing, habit loops, visual rhetoric and the proposed VNLC framework. fileciteturn66file2L87-L140
-
-Some source material describes covert subliminal-control techniques. Those are not turned into an operational manipulation engine. Instead, the project uses the same analytical vocabulary defensively: detect persuasive mechanisms, surface hidden pressure, recommend disclosure and generate transparent alternatives. The source itself identifies media literacy, deliberate decision slowing and metadata analysis as countermeasures. fileciteturn68file3L152-L160
-
-## Project 05 — AI Content Product Studio
-
-The supplied visual material contains reusable patterns for blog writing, ideal-customer targeting, hooks, social proof, calls to action, and pre-written email/newsletter templates. It identifies niches such as Etsy sellers, coaches, digital-product creators and service providers. fileciteturn64file6L1-L10
-
-The product architecture is:
-
-`research → audience model → offer → content system → generation → QA → packaging → human approval → publishing`
-
-## Shared platform architecture
-
-```text
-                 ┌──────────────────────────────┐
-                 │      Model / Reasoning       │
-                 │ local or cloud, provider-agn.│
-                 └──────────────┬───────────────┘
-                                │
-                 ┌──────────────▼───────────────┐
-                 │      Tool / MCP boundary     │
-                 │ files • web • cloud • engines│
-                 └──────────────┬───────────────┘
-                                │
-                 ┌──────────────▼───────────────┐
-                 │ Evidence + Memory + Context │
-                 └──────────────┬───────────────┘
-                                │
-                 ┌──────────────▼───────────────┐
-                 │ Policy / Consequence Engine │
-                 └──────────────┬───────────────┘
-                                │
-                 ┌──────────────▼───────────────┐
-                 │ Verification / Evaluation   │
-                 └──────────────┬───────────────┘
-                                │
-                 ┌──────────────▼───────────────┐
-                 │ Human Decision Boundary     │
-                 └──────────────┬───────────────┘
-                                │
-                 ┌──────────────▼───────────────┐
-                 │ Action / Artifact / Audit   │
-                 └──────────────────────────────┘
-```
-
-This shared control plane is the portfolio's central architectural insight: model intelligence is one component; durable value comes from the evidence, tools, policies, verification and human-control layers around it.
-
-## Judge / reviewer quick start
+## Quick start
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
+python -m pip install --upgrade pip
 pip install -e '.[dev]'
 pytest -q
-python -m cognisync --pretty
-python -m cognisync --demo-gate --pretty
-python -m scripts.demo
+ruff check .
+python scripts/repo_quality_check.py
 ```
 
-The local demo proves the authorization transition but does **not** pretend to send a real external message.
+Run the core demo:
 
-## Documentation
+```bash
+python -m cognisync --pretty
+```
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — technical architecture and deployment progression.
-- [`docs/GRANT_PROPOSAL.md`](docs/GRANT_PROPOSAL.md) — professional English application.
-- [`docs/DEMO_SCENARIO_V2.md`](docs/DEMO_SCENARIO_V2.md) — five-minute demonstration narrative.
-- [`docs/EVALUATION_MATRIX.md`](docs/EVALUATION_MATRIX.md) — evaluation and release gates.
-- [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) — threat model and security invariants.
-- [`docs/BUILD_NOTES.md`](docs/BUILD_NOTES.md) — source-to-implementation decisions.
-- [`projects/`](projects/) — expanded project portfolio.
+Demonstrate the consequence boundary:
 
-## Evidence policy
+```bash
+python -m cognisync --demo-gate --pretty
+python -m cognisync --demo-gate --approve --pretty
+```
 
-Every important technical statement is classified as one of:
+The `--approve` path resolves a **local demo decision only**. No real email, publication, payment, calendar mutation, CRM update or deletion is performed by the public prototype.
 
-**source-derived claim → engineering hypothesis → verified behavior → future roadmap**
+## Architecture
 
-This is particularly important for hardware performance, third-party integrations, ecosystem capabilities and market claims. The supplied documents remain the knowledge source for their concepts; implementation and validation status must be stated separately.
+```text
+               ┌──────────────────────────────┐
+               │ Model / Reasoning             │
+               │ deterministic or Strands      │
+               └──────────────┬───────────────┘
+                              │
+               ┌──────────────▼───────────────┐
+               │ Tools / MCP / Connectors     │
+               └──────────────┬───────────────┘
+                              │
+               ┌──────────────▼───────────────┐
+               │ Evidence + Context           │
+               └──────────────┬───────────────┘
+                              │
+               ┌──────────────▼───────────────┐
+               │ Verification Contract        │
+               └──────────────┬───────────────┘
+                              │
+               ┌──────────────▼───────────────┐
+               │ Consequence / Policy Gate    │
+               └──────────────┬───────────────┘
+                              │
+               ┌──────────────▼───────────────┐
+               │ Human Decision               │
+               └──────────────┬───────────────┘
+                              │
+               ┌──────────────▼───────────────┐
+               │ Connector Execution + Audit  │
+               └──────────────────────────────┘
+```
 
-## Safety principle
+## Repository map
 
-For all agentic projects in this portfolio:
+| Path | Purpose |
+|---|---|
+| `cognisync/` | Core engine, policy, verification, decision gate, audit and adapters |
+| `tests/` | Executable safety and behavior checks |
+| `docs/GRANT_PROPOSAL.md` | Full professional English grant application |
+| `docs/CLAIM_LEDGER.md` | Distinguishes implemented behavior from contracts, roadmap and hypotheses |
+| `docs/MILESTONE_ACCEPTANCE.md` | Objective milestone and release acceptance criteria |
+| `docs/EVALUATION_AND_IMPACT_PLAN.md` | Research protocol and measurement plan |
+| `docs/ARCHITECTURE.md` | Detailed system architecture and production evolution |
+| `docs/THREAT_MODEL.md` | Threats, trust boundaries and security invariants |
+| `docs/DEMO_SCENARIO_V2.md` | Five-minute judge demonstration |
+| `docs/JUDGE_GUIDE.md` | Reviewer-oriented inspection path |
+| `scripts/repo_quality_check.py` | Public-repository hygiene and syntax gate |
 
-**prepared ≠ authorized ≠ executed**
+## Evidence discipline
 
-The objective is not to maximize autonomous activity. It is to maximize useful work while minimizing unnecessary human supervision.
+Documentation uses explicit evidence states:
+
+**implemented** — visible and testable in this repository.  
+**contract** — an enforced interface/invariant without implying an external deployment.  
+**roadmap** — planned production work.  
+**hypothesis** — a proposition requiring measurement.
+
+See [`docs/CLAIM_LEDGER.md`](docs/CLAIM_LEDGER.md).
+
+## Scope and non-goals
+
+CogniSync is not a universal autonomous operating system and is not designed to maximize unchecked agent activity. The prototype does not autonomously perform high-consequence external actions. It also does not turn covert persuasion material into an operational manipulation system.
+
+The goal is narrower and measurable: **maximize useful work per unit of human supervisory attention while keeping consequential authority explicit.**
+
+## Status
+
+This repository is the hackathon/grant artifact. The broader research portfolio and source-derived knowledge base live separately in [`Open-AI-Agents-`](https://github.com/fotografandrzejmikulski-bit/Open-AI-Agents-).
 
 ## License
 
