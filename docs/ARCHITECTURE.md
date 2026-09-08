@@ -8,6 +8,10 @@ CogniSync is a background-first professional agent. Its architecture separates *
 
 > The agent may inspect, classify, summarize and prepare autonomously. It may not silently create externally consequential side effects.
 
+The principal state invariant is:
+
+`prepared ≠ authorized ≠ executed`
+
 ## 2. Runtime topology
 
 ```mermaid
@@ -20,7 +24,7 @@ flowchart TB
   end
   subgraph ToolPlane[Tool & Integration Plane]
     M[MCP Adapters]
-    G[AgentCore Gateway]
+    G[Governed Gateway]
   end
   subgraph Cognition[CogniSync Cognition Plane]
     S[Supervisor Agent\nStrands]
@@ -30,13 +34,13 @@ flowchart TB
   end
   subgraph State[State Plane]
     STM[Session Context]
-    LTM[AgentCore Memory]
+    LTM[Durable Memory]
     A[Append-only Audit]
   end
   subgraph Action[Action Plane]
     BG[Safe Background Work]
     HITL[Human Decision Gate]
-    O[External Effect]
+    O[Trusted Connector]
     BL[Block / Escalate]
   end
   E --> M
@@ -55,9 +59,9 @@ flowchart TB
   R -->|high| HITL
   R -->|critical| BL
   HITL -->|approved| O
+  O -->|confirmed| A
   BG --> A
   HITL --> A
-  O --> A
   BL --> A
   BG --> OUT[Decision-ready Brief]
   HITL --> OUT
@@ -75,30 +79,30 @@ This prevents a correct model inference from being treated as automatic authoriz
 
 ## 4. Strands layer
 
-Strands is the orchestration layer. It owns the agent loop, model interaction and tool use. The project keeps the deterministic safety policy outside the model so that changing models does not silently change authorization rules.
+Strands is the orchestration layer. It owns the agent loop, model interaction and tool use. The deterministic safety policy remains outside the model so changing models does not silently change authorization rules.
 
-The live adapter exposes a narrow integration point in `cognisync.agent`, while the local engine remains deterministic and judgeable.
+The live adapter is intentionally narrow in `cognisync.agent`, while the local engine remains deterministic and judgeable.
 
 ## 5. Memory layer
 
 The production design uses:
 
 - session context for the active workflow;
-- AgentCore Memory for durable summaries, semantic facts and stable user preferences.
+- durable memory for compacted semantic state, stable preferences and recurring project facts.
 
-Memory can improve continuity but does not grant authority. Important decisions retain current-run evidence.
+Memory can improve continuity but does not grant authority. Important consequential operations retain current-run evidence and authorization context.
 
 ## 6. MCP / Gateway layer
 
-AgentCore Gateway is the integration perimeter for professional systems. It can expose MCP tool surfaces and apply inbound/outbound authorization. Provider-specific credentials remain at this boundary rather than entering prompts or model context.
+The gateway is treated as the integration perimeter for professional systems. Tool surfaces should be narrow, authenticated and governed. Provider-specific credentials remain at the connector boundary rather than entering prompts or model context.
 
-Remote resource identifiers should be constrained to trusted schemes and patterns to reduce SSRF/local-resource risks.
+Remote resource identifiers should be constrained to trusted schemes and patterns to reduce SSRF and local-resource exposure risks.
 
 ## 7. A2A specialist layer
 
 A2A is used only when bounded specialization creates measurable value. Example workers include classification, document structure extraction, reporting and quality review.
 
-The supervisor should delegate narrow tasks rather than create an unconstrained agent swarm.
+The supervisor delegates narrow tasks, preserves evidence continuity and remains responsible for final policy evaluation. An unconstrained agent swarm is not an architectural goal.
 
 ## 8. Safety policy
 
@@ -113,45 +117,59 @@ The local implementation lives in `cognisync/policy.py` and is tested independen
 
 ## 9. Audit and provenance
 
-Each meaningful workflow produces machine-readable audit events. Source records can also be represented by provenance hashes. The target event chain is:
+Meaningful workflow transitions generate machine-readable audit events. The local event chain is hash-chained for tamper detection.
 
-`run → analysis → evidence → policy → decision → effect`
+The conceptual correlation path is:
 
-Production telemetry should preserve the same correlation ID across all distributed components.
+`run → analysis → evidence → policy → decision → connector outcome`
 
-## 10. Failure handling
+Production telemetry should preserve a stable run/correlation identifier across distributed components.
+
+## 10. Execution and failure semantics
 
 The design explicitly handles:
 
 - empty input — remain idle rather than fabricate work;
 - unknown action — classify as critical;
-- tool timeout — retry only if policy allows, otherwise fail safely;
-- malformed tool result — no false completion;
-- external side effect — require connector confirmation;
-- prompt injection — treat external content as untrusted data, never authority.
+- missing evidence — reject candidate promotion;
+- tool timeout — retry only where operation semantics and policy permit;
+- malformed tool result — do not report completion;
+- ambiguous external outcome — remain non-success until trusted confirmation;
+- prompt injection — treat external content as untrusted data, never authority;
+- decision replay — reject reuse of a resolved decision.
+
+The production system must model execution as:
+
+`prepared → decision_pending → approved/rejected → connector_confirmed`
+
+No local simulation, model statement or request dispatch is sufficient to establish `connector_confirmed`.
 
 ## 11. Deployment progression
 
 ### Stage A — local judgeable prototype
 
-No AWS credentials required. Run tests and deterministic demo.
+No cloud credentials required. Run tests and deterministic demos.
 
-### Stage B — Bedrock model
+### Stage B — model-backed agent
 
-Install the AWS extra and configure a supported model ID.
+Install the AWS integration extra and configure a validated model/runtime environment.
 
-### Stage C — AgentCore Runtime
+### Stage C — hosted execution
 
-Use the current AgentCore CLI/project scaffolding and deployment workflow. AWS currently documents A2A deployment with `StrandsA2AExecutor` and `serve_a2a`, with port 9000 as the default A2A server port. 
+Deploy the agent to the chosen hosted runtime only after validating current SDKs, IAM, networking, secrets and observability in the target environment.
 
 ### Stage D — real MCP integrations
 
-Connect narrowly scoped professional systems through AgentCore Gateway with explicit authorization.
+Connect narrowly scoped professional systems through a governed tool boundary with explicit authorization and connector confirmation.
 
 ### Stage E — bounded A2A specialization
 
-Introduce remote specialist agents only where benchmarks demonstrate a measurable advantage.
+Introduce remote specialist agents only where benchmarks demonstrate measurable quality, latency, cost or reliability benefit.
 
 ### Stage F — continuous evaluation
 
 Run regression, adversarial and fault-injection evaluation on each meaningful change.
+
+## 12. Architecture acceptance rule
+
+A production architecture claim is accepted only when the corresponding integration is validated in the target environment. Repository code, dependency presence or a diagram is not treated as proof of deployment.
