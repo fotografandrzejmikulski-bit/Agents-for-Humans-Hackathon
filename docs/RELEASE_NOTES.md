@@ -1,33 +1,45 @@
-# Release Notes — CogniSync Professional 0.2.0
+# Release Notes — CogniSync Professional 0.3.0
 
 ## Submission hardening
 
-The project has been upgraded from a concept-heavy prototype into a judgeable submission package with explicit separation between autonomous preparation, authorization and execution.
+This release tightens the repository around one auditable product contract:
 
-### Added
+`prepared ≠ authorized ≠ executed`
 
-- consequence-aware decision gate;
-- fail-closed risk policy;
-- evidence/provenance helpers;
-- append-only audit events;
-- deterministic local demo;
-- heartbeat/background-work abstraction;
-- health/readiness helper;
-- evaluation matrix and release gates;
-- threat model;
-- judge-focused review guide;
-- professional English grant application;
-- CI workflow for lint and tests;
-- clean repository submission checklist.
+### Added / strengthened
 
-### Correctness posture
+- explicit consequence-aware decision gate;
+- single-use decision lifecycle;
+- fail-closed policy for unknown capabilities;
+- deterministic verification contract before insight promotion;
+- evidence/provenance requirements;
+- tamper-evident hash-chained audit trail;
+- explicit external-execution confirmation contract;
+- failure-path regression tests;
+- repository quality and documentation-hygiene checks;
+- claim ledger separating implementation from roadmap and hypotheses;
+- measurable milestone acceptance criteria;
+- reproducibility protocol;
+- data-governance boundary;
+- strengthened threat model and evaluation plan;
+- cleaner judge and demo paths;
+- removal of unrelated portfolio material from the grant repository.
 
-The repository does not claim that AWS infrastructure is already provisioned. AgentCore Runtime, Memory, Gateway/MCP and A2A are production integration targets documented against current platform capabilities.
+## Correctness posture
 
-The local prototype intentionally uses synthetic data and never pretends that a simulated approval performed a real-world side effect.
+The repository deliberately distinguishes:
 
-## Release invariant
+- **implemented local behavior** — executable and testable now;
+- **contracts** — enforced boundaries that do not imply an external integration;
+- **production roadmap** — architecture and work still requiring deployment validation;
+- **research hypotheses** — propositions requiring measurement.
+
+No AWS production infrastructure, real external send, or performance improvement is claimed merely because the repository contains an adapter, dependency or architecture diagram.
+
+## Submission invariant
+
+Future connectors and cloud integrations must preserve:
 
 `prepared != authorized != executed`
 
-Any future connector must preserve this invariant.
+Any change that weakens that invariant should be treated as a security-sensitive change and blocked by review.
