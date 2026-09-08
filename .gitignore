@@ -14,5 +14,6 @@ htmlcov/
 .terraform/
 terraform.tfstate*
 data/audit.jsonl
+data/*audit*.jsonl
 data/*.tmp
 data/*.out
