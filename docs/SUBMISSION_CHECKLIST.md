@@ -3,42 +3,51 @@
 ## Repository readiness
 
 - [x] Public GitHub repository
-- [x] Strands Agents-based implementation surface
+- [x] Strands Agents integration surface
 - [x] Professional Agents positioning
-- [x] Runnable local prototype without AWS credentials
-- [x] README with quick start, architecture and security model
+- [x] Runnable local prototype without cloud credentials
+- [x] README with quick start, architecture and scope boundaries
 - [x] Mermaid architecture diagram
 - [x] MIT license
 - [x] Automated tests and CI workflow
 - [x] Explicit human decision gate
-- [x] Fail-closed unknown-action policy
+- [x] Fail-closed unknown-capability policy
 - [x] Evidence and provenance model
-- [x] Append-only audit trail
-- [x] Background heartbeat component
+- [x] Verification contract
+- [x] Hash-chained audit trail
 - [x] Judgeable five-minute demo scenario
 - [x] English grant proposal
-- [x] Threat model and evaluation matrix
+- [x] Threat model
+- [x] Evaluation and impact plan
+- [x] Claim ledger
+- [x] Milestone acceptance criteria
+- [x] Reproducibility protocol
+- [x] Data governance boundary
 
 ## Final submission actions
 
-- [ ] Confirm hackathon registration on Devpost
-- [ ] Confirm final Devpost submission fields
-- [ ] Record final demo video within the published five-minute limit
-- [ ] Add the final demo URL to the Devpost submission
-- [ ] Confirm AWS promotional-credit request before its published deadline
+- [ ] Confirm current hackathon registration and entry requirements on the official submission platform
+- [ ] Confirm final submission form fields and required URLs
+- [ ] Record final demo video within the published time limit
+- [ ] Add the final demo URL to the submission
+- [ ] Confirm any current AWS credit or program request requirements from the official program page
 - [ ] Perform a clean-room clone/install/test from the public repository
 - [ ] Run `pytest -q`
 - [ ] Run `ruff check .`
+- [ ] Run `python scripts/repo_quality_check.py`
+- [ ] Review `docs/CLAIM_LEDGER.md` against the final submission wording
 
 ## What the demo must prove
 
 1. Background work happens without continuous human supervision.
 2. Important outputs retain evidence.
-3. Consequential actions cross an explicit policy boundary.
-4. Human approval/rejection is auditable.
-5. Unknown actions fail closed.
-6. No external completion is claimed without real connector confirmation.
+3. A consequential capability crosses an explicit policy boundary.
+4. Approval is a distinct state transition.
+5. A resolved decision cannot be reused through the decision gate.
+6. Unknown capabilities fail closed.
+7. Audit integrity can detect tampering.
+8. No external completion is claimed without trusted connector confirmation.
 
 ## Current honest scope
 
-The repository contains a functional local prototype and production-oriented architecture. A live AWS deployment, real MCP integrations, notification channel and cloud telemetry are environment-specific next steps and must not be represented as already deployed unless provisioned and verified.
+The repository contains a functional local prototype and production-oriented architecture. Live cloud deployment, real MCP integrations, external notification channels, durable production memory and cloud telemetry remain environment-specific implementation steps and must not be represented as already deployed unless they have been provisioned and verified.
