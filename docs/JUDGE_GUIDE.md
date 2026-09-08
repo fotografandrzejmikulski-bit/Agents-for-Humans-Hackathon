@@ -1,97 +1,107 @@
-# Judge Guide — CogniSync Professional
+# Judge / Reviewer Guide
 
-This guide is designed for a reviewer who has 3–5 minutes to understand and verify the submission.
+## What to evaluate
 
-## 1. What to notice first
+CogniSync is a background-first professional agent. The core question is not whether it can generate text; it is whether it can absorb repetitive coordination work without silently acquiring authority over consequential outcomes.
 
-CogniSync is not a chatbot demo. It demonstrates a **background-first operating model**:
+The key invariant is:
 
-`observe → analyze → prepare → evaluate consequence → act or wait → audit`
+`prepared ≠ authorized ≠ executed`
 
-The defining boundary is:
+## 5-minute path
 
-> The model may recommend an action. Authorization is a separate system decision.
+### 1. Install
 
-## 2. Fastest verification path
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -e '.[dev]'
+```
 
-### A. Safe autonomous work
+### 2. Verify the repository
+
+```bash
+pytest -q
+ruff check .
+python scripts/repo_quality_check.py
+```
+
+### 3. Run autonomous background work
 
 ```bash
 python -m cognisync --pretty
 ```
 
-Expected:
+Expected behavior: local project inputs are processed without an approval prompt; useful insights include source evidence; no consequential effect is executed.
 
-- `status: completed`
-- evidence-backed insight(s)
-- source references retained
-- no human gate
-- no claim of external execution
-
-### B. Consequential action
+### 4. Trigger the consequence boundary
 
 ```bash
 python -m cognisync --demo-gate --pretty
 ```
 
-Expected:
+Expected behavior: a `decision_required` result exposes the capability, risk, reason, evidence and proposed payload. The local prototype does not send a real message.
 
-- `status: decision_required`
-- explicit action classification
-- high-risk decision request
-- evidence attached
-- proposed payload attached
-
-### C. Human resolution
+### 5. Resolve the local demo decision
 
 ```bash
 python -m cognisync --demo-gate --approve --pretty
 ```
 
-Expected:
+Expected behavior: the decision changes from `pending` to `approved`; the audit stream records the transition; no external side effect is claimed.
 
-- approval event is written to the audit trail
-- the local prototype still performs **no real external send**
+Inspect:
 
-This distinction is intentional. A production connector would execute only after policy authorization and would return tool-confirmed completion.
+```text
+data/audit.jsonl
+```
 
-## 3. Code paths worth inspecting
+The audit stream is hash chained and independently verifiable through `AuditLog.verify_integrity()`.
 
-| Concern | File | Why it matters |
-|---|---|---|
-| Background orchestration | `cognisync/engine.py` | separates observation/analysis from side effects |
-| Risk taxonomy | `cognisync/policy.py` | fail-closed action classification |
-| Human gate | `cognisync/decision.py` | explicit approval boundary |
-| Evidence | `cognisync/analysis.py`, `cognisync/evidence.py` | provenance is carried into results |
-| Auditability | `cognisync/audit.py` | append-only state-transition record |
-| Real model adapter | `cognisync/agent.py` | Strands/Bedrock integration point |
-| Tests | `tests/` | demonstrates normal and adversarial boundary behavior |
+## What is implemented
 
-## 4. What is prototype vs production
+- deterministic local project analysis;
+- evidence-backed insight objects;
+- verification contract;
+- model-independent policy classification;
+- fail-closed unknown capabilities;
+- explicit human decision request;
+- single-use decision resolution;
+- execution recording only after approval;
+- tamper-evident audit chain;
+- automated positive and negative-path tests.
 
-The local core is executable without AWS credentials.
+## What is not claimed
 
-The AWS/AgentCore components are an explicit production integration path, not a false claim that cloud resources have already been provisioned.
+- no provisioned AWS production environment is represented as complete;
+- no real outbound message is sent by the public demo;
+- no production MCP connector is silently assumed;
+- no performance or productivity percentage is presented without measured evidence;
+- no exactly-once external delivery guarantee is claimed.
 
-This makes the submission reproducible and keeps architecture claims auditable.
+The Strands/Bedrock adapter and AgentCore-oriented architecture describe the intended production path and should be evaluated separately from the deterministic local proof.
 
-## 5. The design thesis
+## Reviewer questions the repository should answer
 
-Most agent systems optimize for **more autonomous activity**.
+1. What happens when evidence is missing? → verification fails closed.
+2. What happens when the requested capability is unknown? → critical risk and approval required.
+3. Can approval be reused? → no; resolved decisions cannot be resolved again.
+4. Can the model's confidence authorize a side effect? → no; policy is model-independent.
+5. Can a timeout be treated as success? → no; production connectors must require definitive confirmation.
+6. Can the audit history be silently edited? → edits break hash-chain verification.
 
-CogniSync optimizes for:
+## Evidence map
 
-**useful work per unit of human attention**.
-
-The human is removed from repetitive coordination, but remains the authority over meaningful consequences.
-
-## 6. Expected judging evidence
-
-A strong evaluation should be able to verify that:
-
-1. safe work is completed without approval;
-2. consequential work is gated;
-3. unknown actions fail closed;
-4. evidence is preserved;
-5. audit records reconstruct the decision path;
-6. the cloud design is credible without overstating deployment status.
+| Question | File |
+|---|---|
+| Core orchestration | `cognisync/engine.py` |
+| Authorization policy | `cognisync/policy.py` |
+| Decision lifecycle | `cognisync/decision.py` |
+| Verification contract | `cognisync/verification.py` |
+| Audit integrity | `cognisync/audit.py` |
+| Threat model | `docs/THREAT_MODEL.md` |
+| Research metrics | `docs/EVALUATION_AND_IMPACT_PLAN.md` |
+| Claim discipline | `docs/CLAIM_LEDGER.md` |
+| Release criteria | `docs/MILESTONE_ACCEPTANCE.md` |
+| Grant argument | `docs/GRANT_PROPOSAL.md` |
