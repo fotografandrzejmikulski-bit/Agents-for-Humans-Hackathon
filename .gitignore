@@ -13,3 +13,6 @@ coverage.xml
 htmlcov/
 .terraform/
 terraform.tfstate*
+data/audit.jsonl
+data/*.tmp
+data/*.out
