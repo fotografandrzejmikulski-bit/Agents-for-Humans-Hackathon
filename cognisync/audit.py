@@ -24,11 +24,11 @@ class AuditLog:
             "prev_hash": self._previous_hash,
             **fields,
         }
-        canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        canonical = self._canonical_payload(payload)
         event_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
         payload["event_hash"] = event_hash
         with self.path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
+            handle.write(json.dumps(payload, ensure_ascii=False, sort_keys=True) + "\n")
         self._previous_hash = event_hash
         return payload
 
@@ -37,24 +37,48 @@ class AuditLog:
         checked = 0
         if not self.path.exists():
             return True, 0, None
+
         for line_no, line in enumerate(self.path.read_text(encoding="utf-8").splitlines(), start=1):
-            record = json.loads(line)
+            if not line.strip():
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                return False, checked, f"line {line_no}: invalid JSON"
+            if not isinstance(record, dict):
+                return False, checked, f"line {line_no}: record is not an object"
+
             expected_previous = record.get("prev_hash", "")
             if expected_previous != previous:
                 return False, checked, f"line {line_no}: prev_hash mismatch"
-            supplied_hash = record.pop("event_hash", None)
-            canonical = json.dumps(record, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-            expected_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+            supplied_hash = record.get("event_hash")
+            if not isinstance(supplied_hash, str):
+                return False, checked, f"line {line_no}: missing event_hash"
+
+            unsigned = dict(record)
+            unsigned.pop("event_hash", None)
+            expected_hash = hashlib.sha256(self._canonical_payload(unsigned).encode("utf-8")).hexdigest()
             if supplied_hash != expected_hash:
                 return False, checked, f"line {line_no}: event_hash mismatch"
+
             previous = supplied_hash
             checked += 1
+
         return True, checked, None
+
+    @staticmethod
+    def _canonical_payload(payload: dict[str, Any]) -> str:
+        return json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
     def _load_previous_hash(self) -> str:
         if not self.path.exists():
             return ""
-        lines = self.path.read_text(encoding="utf-8").splitlines()
+        lines = [line for line in self.path.read_text(encoding="utf-8").splitlines() if line.strip()]
         if not lines:
             return ""
-        return json.loads(lines[-1]).get("event_hash", "")
+        try:
+            payload = json.loads(lines[-1])
+        except json.JSONDecodeError:
+            return ""
+        return payload.get("event_hash", "") if isinstance(payload, dict) else ""
