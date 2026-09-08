@@ -30,10 +30,10 @@ Expected: the local decision is recorded as approved. The prototype still perfor
 
 1. Background work happens without conversational micromanagement.
 2. Evidence remains attached to the insight.
-3. A consequential action crosses an explicit policy boundary.
+3. A consequential capability crosses an explicit policy boundary.
 4. The human resolves the boundary rather than supervising every read/draft operation.
-5. Audit events make the path inspectable.
+5. Audit events make the path inspectable and tamper-evident.
 
-## Cloud evolution
+## Production evolution
 
-The local core is deliberately independent of credentials. The production path is Strands + Amazon Bedrock AgentCore Runtime, with AgentCore Memory for durable context, AgentCore Gateway for authenticated MCP access and A2A for bounded specialist delegation. AWS currently documents `agentcore create`/`agentcore deploy` workflows and A2A hosting through `StrandsA2AExecutor` and `serve_a2a`.
+The local core is deliberately independent of credentials. The production architecture is designed to integrate a Strands-based agent with hosted runtime, durable memory, governed MCP connectors and bounded specialist delegation. Exact deployment commands, SDK versions, IAM configuration and service capabilities must be validated against the target environment before rollout.
