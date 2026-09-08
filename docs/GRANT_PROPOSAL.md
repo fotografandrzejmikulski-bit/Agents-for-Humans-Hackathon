@@ -3,62 +3,91 @@
 
 **Applicant:** Andrzej Mikulski  
 **Track:** Professional Agents  
-**Repository:** https://github.com/fotografandrzejmikulski-bit/Agents-for-Humans-Hackathon
+**Repository:** https://github.com/fotografandrzejmikulski-bit/Agents-for-Humans-Hackathon  
+**Primary thesis:** *Let the agent own the repetition. Let the human own the consequence.*
 
 ---
 
 ## 1. Executive Summary
 
-CogniSync Professional is a **background-first professional AI agent** designed to remove repetitive coordination work while preserving human authority over consequential decisions.
+CogniSync Professional is a **background-first professional AI agent** designed to remove repetitive coordination work while preserving explicit human authority over consequential outcomes.
 
-Instead of requiring a professional to operate an assistant continuously, CogniSync runs a controlled work loop:
+The product addresses a practical weakness in current assistant workflows: the human is often required to remain the operator of the agent even when most of the work consists of collecting signals, reconciling project state, drafting routine outputs, checking evidence and deciding what actually deserves attention.
+
+CogniSync proposes a different division of labor:
 
 **observe → interpret → verify → prepare → evaluate consequence → act or wait → audit**
 
-Routine information work can proceed autonomously. Consequential work—such as sending an external message, publishing a deliverable, changing a business record, initiating payment, or deleting information—is stopped at an explicit authorization boundary.
+Routine information work is allowed to proceed autonomously. Consequential capabilities—such as sending an external message, publishing a deliverable, changing a business record, initiating a payment, or deleting data—cross an explicit authorization boundary. Unknown capabilities fail closed.
 
-The central product thesis is:
+The product optimizes a specific socio-technical objective:
 
-> **Let the agent own the repetition. Let the human own the consequence.**
+> **Maximize useful, evidence-backed work per unit of human supervisory attention.**
 
-CogniSync is aimed initially at creators, consultants, freelancers, independent professionals and small teams whose work is distributed across communication, documents, project systems and calendars. The agent is not intended to replace those systems; it provides an operating layer that continuously turns fragmented signals into verified, decision-ready work.
+The public submission already includes a reproducible local prototype with deterministic analysis, evidence/provenance, a model-independent policy, a human decision gate, verification contracts, hash-chained audit logging, automated tests and reviewer-oriented documentation. The repository deliberately separates **implemented behavior** from **production architecture** and does not claim unprovisioned cloud infrastructure or unexecuted external effects.
 
-The submission has a reproducible local prototype with deterministic analysis, evidence/provenance, model-independent risk policy, a human decision gate, verification contracts, tamper-evident audit logging, CLI/demo flows and automated tests. The production path is designed around Strands Agents and Amazon Bedrock AgentCore Runtime, Memory, Gateway/MCP and bounded A2A workers. The repository deliberately separates **implemented behavior** from **future cloud deployment** and does not claim AWS resources that have not been provisioned.
-
----
-
-## 2. Problem
-
-Professional work is dominated by context switching rather than a small number of difficult decisions. A typical workflow repeatedly requires a person to inspect messages, compare project status, find missing dependencies, draft routine communication, compile reports, remember follow-ups and decide what deserves attention.
-
-The result is a paradox: the assistant intended to save time becomes another application the human must operate.
-
-The opportunity is therefore not simply to make an agent more capable. It is to change the division of labor between the agent and the human.
-
-CogniSync treats **human attention as a scarce resource** and asks a different optimization question:
-
-> How much useful, evidence-backed work can the system complete per unit of human supervisory attention?
+Grant support would be used to turn the local proof into a constrained professional pilot, validate the production integration path, implement governed connectors, and produce empirical evidence about whether background-first agent behavior can reduce coordination burden without sacrificing safety or trust.
 
 ---
 
-## 3. Solution
+## 2. Funding Case at a Glance
 
-CogniSync is a professional attention-management layer that continuously processes project signals and produces a compact, evidence-backed operational state.
+| Dimension | Proposed outcome | How it will be evidenced |
+|---|---|---|
+| Product | Background-first professional coordination layer | Working prototype + pilot |
+| Safety | No unauthorized consequential actions in the evaluated control path | Policy, decision and adversarial tests |
+| Trust | Evidence-backed decision packets and inspectable state transitions | Provenance + audit records + user study |
+| Efficiency | Lower routine coordination time and intervention burden | Baseline comparison |
+| Research value | Testable hypotheses about human attention and agent autonomy | Predefined evaluation protocol |
+| Open-source value | Reproducible reference implementation and deployment/evaluation documentation | Public repository |
 
-The product performs six primary functions:
-
-1. **Observe** — ingest signals from files, notes, communication systems, project records and approved MCP-connected tools.
-2. **Interpret** — detect change, dependencies, blockers, missing decisions and emerging follow-up needs.
-3. **Verify** — validate output structure, evidence presence, confidence bounds and actionability before promotion.
-4. **Prepare** — generate briefs, draft follow-ups, reports and explicit decision packets.
-5. **Evaluate consequence** — classify every proposed capability through a model-independent policy.
-6. **Act or wait** — autonomous for safe preparation; human approval for consequential effects; fail closed for unknown capabilities.
-
-The result is a system designed to stay useful in the background while remaining intentionally conservative at the point where real-world consequences begin.
+The request is therefore not funding for an abstract agent concept. It is funding to validate a specific operating model with measurable technical and human outcomes.
 
 ---
 
-## 4. Target Users and Initial Use Cases
+## 3. Problem
+
+Professional work contains a large amount of coordination overhead: reading updates, comparing sources, identifying blockers, compiling status, preparing follow-ups, locating supporting information, remembering pending decisions and deciding what can safely wait.
+
+Interactive assistants can accelerate individual steps, but they often preserve the same supervision problem: the human still has to open the system, provide context, issue prompts, review intermediate outputs and orchestrate the sequence.
+
+This creates a design gap between **capability** and **useful autonomy**.
+
+The important question is not only:
+
+> What can an agent do?
+
+It is also:
+
+> What can an agent continue doing safely when nobody is watching every step?
+
+CogniSync treats human attention as a constrained resource and moves routine coordination into a background workflow while keeping consequential authority explicit.
+
+---
+
+## 4. Solution
+
+CogniSync is a professional attention-management layer that turns fragmented project signals into verified, decision-ready work.
+
+### Core workflow
+
+1. **Observe** — ingest approved project signals from files, notes, communication systems and connected tools.
+2. **Interpret** — identify meaningful change, blockers, dependencies and follow-up needs.
+3. **Verify** — validate candidate outputs for required structure, evidence, confidence bounds and actionability.
+4. **Prepare** — produce briefs, drafts, summaries and decision packets.
+5. **Evaluate consequence** — classify the requested capability independently of model confidence.
+6. **Act or wait** — autonomous for approved safe work; explicit human authorization for consequential effects; fail closed for unknown capabilities.
+7. **Audit** — retain machine-readable records for important state transitions and connector outcomes.
+
+The core principle is:
+
+`prepared ≠ authorized ≠ executed`
+
+An agent may prepare a message without being allowed to send it. A human may approve a decision without that approval being evidence that the external action actually succeeded. Only a trusted connector can establish execution.
+
+---
+
+## 5. Target Users and Initial Use Cases
 
 ### Primary users
 
@@ -78,175 +107,181 @@ The result is a system designed to stay useful in the background while remaining
 
 **Decision capture** — surface the smallest set of human decisions that materially affect execution.
 
-**Exception monitoring** — remain quiet when nothing important changed and interrupt only when an escalation is justified.
+**Exception monitoring** — remain quiet when nothing important changed and interrupt only when a meaningful escalation is justified.
 
 ---
 
-## 5. What Is Novel
+## 6. What Is Novel
 
-The novelty is not another chat interface and not simply greater autonomy.
+CogniSync's novelty is not another chat UI and not maximum autonomous action. It is a control-plane approach to useful autonomy.
 
-CogniSync combines four architectural ideas into one measurable operating model:
+### 6.1 Consequence-aware autonomy
 
-### 5.1 Consequence-aware autonomy
+Capability risk is determined independently of model confidence. A more persuasive or more confident model output does not acquire more authority.
 
-The system evaluates the *consequence class of a capability* independently of model confidence. A capable model can propose an action; only the authorization layer can permit it.
+### 6.2 Evidence-carrying work products
 
-### 5.2 Evidence-carrying work products
+Important work products are not promoted simply because a model generated them. They carry evidence references and pass deterministic verification.
 
-Insights are not accepted as complete merely because a model produced them. Important outputs carry evidence references, confidence and actionability fields and pass an explicit verification contract.
+### 6.3 Human attention as an optimization variable
 
-### 5.3 Human attention as an optimization variable
+The system is evaluated on successful work **and** on the supervisory burden required to achieve it. Lower intervention is valuable only while safety and quality floors remain intact.
 
-The product is evaluated not only on task success, but on how many supervisory interactions it requires. Reduced human intervention is valuable only while quality and safety floors remain intact.
+### 6.4 Honest execution semantics
 
-### 5.4 Honest execution semantics
-
-The system distinguishes three states that must never collapse into one:
+The system explicitly separates three states:
 
 **prepared ≠ authorized ≠ executed**
 
-An approval event does not become proof of external execution. A real connector must confirm the effect before the system can report completion.
+This eliminates a common failure mode in agentic systems: confusing intention, request dispatch or local simulation with actual real-world completion.
+
+### 6.5 Researchable architecture
+
+Each important design choice maps to a hypothesis, a test family and a falsification condition. The goal is to produce evidence, not merely a persuasive demonstration.
 
 ---
 
-## 6. Research Hypotheses
+## 7. Research Hypotheses
 
 ### H1 — Attention efficiency
 
-A background-first agent can reduce routine coordination time and human intervention count relative to an interactive-assistant workflow, while maintaining predefined quality floors.
+A background-first agent can reduce routine coordination time and human intervention count relative to an interactive-assistant workflow while maintaining predefined quality floors.
 
 ### H2 — Consequence control
 
-A model-independent policy plus explicit human decision gate can reduce unauthorized side effects to zero in the evaluated prototype and maintain that property under adversarial scenarios.
+A model-independent policy plus explicit human decision gate can maintain zero unauthorized consequential actions in the evaluated control path, including adversarial scenarios designed to bypass natural-language safeguards.
 
 ### H3 — Verification value
 
-Adding structured verification before promotion can reduce unsupported or malformed agent outputs relative to an unverified generation path.
+Structured verification before output promotion reduces unsupported or malformed work relative to an unverified generation path.
 
-### H4 — Evidence increases trust
+### H4 — Evidence and trust
 
-Decision packets containing explicit evidence and reason codes will be rated as more understandable and trustworthy than equivalent packets without provenance.
+Decision packets containing explicit evidence, rationale and action boundaries are easier for professionals to review and more appropriate for authorization than equivalent packets without provenance.
 
-The project is successful only if these hypotheses can be tested and potentially falsified. It is not treated as a success merely because the system can complete a demonstration.
+### H5 — Background quietness
+
+Exception-based surfacing can reduce notification and supervisory burden without reducing completion quality for the evaluated workflow class.
+
+The project is considered successful only if these hypotheses can be measured and potentially falsified.
 
 ---
 
-## 7. Technical Architecture
+## 8. Technical Architecture
 
 ```mermaid
 flowchart TB
-    S[Project Signals\nfiles • notes • email • CRM • calendar] --> I[MCP / Integration Adapters]
-    I --> G[AgentCore Gateway / MCP Boundary]
-    G --> SUP[CogniSync Supervisor\nStrands Agents]
-    SUP <--> STM[Session Context]
-    SUP <--> LTM[AgentCore Memory]
-    SUP --> D[A2A Bounded Specialists]
-    SUP --> E[Evidence / Provenance]
+    S[Professional Signals] --> T[Typed Tool / MCP Boundary]
+    T --> A[CogniSync Supervisor\nStrands-based]
+    A <--> C[Session Context]
+    A <--> M[Durable Memory]
+    A --> W[Bounded Specialist Workers]
+    A --> E[Evidence / Provenance]
+    W --> E
     E --> V[Verification Contract]
     V --> P[Consequence Policy]
-    P -->|LOW| B[Background Safe Work]
-    P -->|MEDIUM| R[Review / Policy Route]
+    P -->|LOW| B[Safe Background Work]
+    P -->|MEDIUM| R[Review Route]
     P -->|HIGH| H[Human Decision Gate]
-    P -->|CRITICAL| X[Block + Escalate]
-    H -->|approved| C[Trusted Connector]
-    C -->|confirmed| O[Verified External Effect]
-    B --> A[Audit / Telemetry]
-    H --> A
-    X --> A
-    O --> A
-    B --> K[Decision-ready Brief]
-    H --> K
-    K --> U[Professional]
+    P -->|CRITICAL| X[Block / Escalate]
+    H -->|approved| K[Trusted Connector]
+    K -->|confirmed| O[Verified External Effect]
+    B --> U[Decision-ready Output]
+    H --> U
+    X --> U
+    B --> Q[Audit / Telemetry]
+    H --> Q
+    X --> Q
+    O --> Q
 ```
 
-The architecture is deliberately layered:
+The architecture separates:
 
-- **Reasoning layer** — plans and interprets.
-- **Capability layer** — exposes narrowly scoped tools and MCP integrations.
-- **Evidence layer** — preserves provenance and current-run support.
-- **Verification layer** — validates candidate outputs before promotion.
-- **Policy layer** — determines what the agent is allowed to do.
-- **Decision layer** — obtains explicit human authority for consequential effects.
-- **Execution layer** — performs actions only through trusted connectors.
-- **Audit layer** — reconstructs state transitions and authorization history.
+- **reasoning** — planning and interpretation;
+- **capabilities** — typed tools and connector surfaces;
+- **evidence** — current-run provenance;
+- **verification** — deterministic quality contract;
+- **policy** — capability authorization independent of model confidence;
+- **decision** — human authority for consequential actions;
+- **execution** — trusted connector confirmation;
+- **audit** — reconstruction of important state transitions.
 
-This separation allows the model to be replaced without changing the authorization contract.
-
----
-
-## 8. Strands Agents and AgentCore Strategy
-
-Strands Agents is the primary orchestration framework for the project and provides the agent-loop foundation required by the hackathon.
-
-For production deployment, CogniSync is designed to evolve toward Amazon Bedrock AgentCore Runtime for hosted execution, AgentCore Memory for durable contextual state, AgentCore Gateway for governed MCP integration, and bounded A2A services for specialized workers.
-
-The repository keeps these integrations modular. The local prototype remains executable without AWS credentials, while the cloud path is represented as an explicit deployment layer rather than a simulated environment.
-
-The project will pin tested SDK and CLI versions for each production environment before deployment. Documentation examples are not treated as API guarantees.
+This separation allows the reasoning model to change without silently changing authorization policy.
 
 ---
 
-## 9. Memory and Context Model
+## 9. Strands and Production Runtime Strategy
 
-The agent uses two conceptual memory classes:
+Strands Agents is the primary orchestration framework for the project. The public implementation includes a narrow model-backed adapter while keeping the deterministic local proof independent of cloud credentials.
 
-**Session memory** — current task state, recent observations, active decisions and pending actions.
+The production path is designed to evolve toward a hosted runtime, durable memory and governed MCP/connector boundaries, with bounded A2A specialization where measurement justifies decomposition.
+
+The proposal deliberately distinguishes architecture from deployment. A dependency, adapter or diagram is not treated as proof that a cloud resource is provisioned.
+
+Before production rollout, the selected SDK versions, runtime configuration, IAM model, networking, secrets and connector contracts will be pinned and validated in the target environment.
+
+---
+
+## 10. Memory and Context Model
+
+CogniSync uses two conceptual memory classes:
+
+**Session context** — active workflow state, current evidence, pending decisions and recent observations.
 
 **Long-term memory** — stable preferences, recurring project facts and compacted semantic context.
 
-Memory is not authorization. Even when a long-term preference indicates that a user usually approves a specific kind of operation, the current consequential operation remains subject to the current policy and evidence requirements.
+Memory is explicitly **not authorization**. A historical preference cannot become a permanent permission grant for a consequential operation.
 
-This prevents memory from silently becoming a permanent permission grant.
+Important consequential decisions remain anchored to current-run evidence and current policy.
 
 ---
 
-## 10. Verification Contract
+## 11. Verification Contract
 
-Every promoted insight is required to satisfy a deterministic contract covering:
+Every promoted insight must satisfy a deterministic contract covering:
 
 - schema completeness;
 - evidence presence;
-- confidence range;
+- confidence bounds;
 - actionability;
 - collection-level integrity.
 
-The implementation intentionally distinguishes *candidate output* from *promoted output*.
+The prototype distinguishes candidate output from promoted output:
 
 ```text
 MODEL OUTPUT
    ↓
-STRUCTURAL CHECKS
+STRUCTURAL VALIDATION
    ↓
-EVIDENCE CHECK
+EVIDENCE VALIDATION
    ↓
-CONFIDENCE CHECK
+CONFIDENCE VALIDATION
    ↓
-ACTIONABILITY CHECK
+ACTIONABILITY VALIDATION
    ↓
 PROMOTE / REJECT
 ```
 
-This is the local prototype's concrete form of the broader neuro-symbolic verification principle: probabilistic generation is followed by deterministic validation before an output becomes eligible for downstream use.
+This implements a practical probabilistic-to-deterministic verification loop: model output proposes; deterministic rules decide whether it is eligible for downstream use.
 
 ---
 
-## 11. Consequence Boundary and Human-in-the-Loop
+## 12. Consequence Boundary and Human-in-the-Loop
 
-CogniSync uses a four-level risk taxonomy:
+The authorization policy uses four levels:
 
 | Risk | Examples | Default behavior |
 |---|---|---|
 | LOW | read, summarize, classify, draft | autonomous |
 | MEDIUM | reversible internal preparation | policy-dependent |
 | HIGH | send, publish, modify records, payment | human approval |
-| CRITICAL | unknown capability, destructive operation, privilege escalation | blocked + human decision |
+| CRITICAL | unknown capability, destructive operation, privilege escalation | block + explicit decision |
 
-Unknown actions are intentionally mapped to **CRITICAL**.
+Unknown capabilities are critical by design.
 
-The policy does not inspect the model's confidence and cannot be overridden by persuasive language generated by the model.
+The policy does not inspect model confidence. It classifies capabilities based on their consequence class.
 
-A decision request has an explicit lifecycle:
+The decision lifecycle is:
 
 `PENDING → APPROVED`
 
@@ -254,112 +289,92 @@ or
 
 `PENDING → REJECTED`
 
-An already resolved decision cannot be reused.
-
-Only an approved decision may subsequently be recorded as executed, and execution must contain connector-level confirmation.
+Resolved decisions cannot be resolved again, and execution cannot be recorded before approval.
 
 ---
 
-## 12. Auditability and Integrity
+## 13. Auditability and Integrity
 
-The local prototype records machine-readable audit events for run start, analysis, verification, decision request, decision resolution and action outcome.
+The prototype records machine-readable events for run start, analysis, verification, decision requests, decision resolution and action outcomes.
 
-The audit trail is **hash chained** so tampering can be detected during verification.
+The local audit stream is **hash chained** so modifications can be detected during independent verification.
 
-```text
-Event n
-  ↓ hash
-Event n+1
-  ↓ hash
-Event n+2
-```
-
-This does not claim immutable enterprise-grade storage. It establishes a reproducible integrity mechanism that can be replaced by a managed logging/trace system in production.
+This is a tamper-evident mechanism, not a claim of immutable enterprise logging. Production deployments can replace the local store with managed observability infrastructure while preserving the same semantic event model.
 
 ---
 
-## 13. MCP and Connector Security
+## 14. Connector and MCP Security
 
-MCP is treated as a capability boundary, not as an untrusted instruction channel.
+Connectors are treated as capability boundaries rather than general-purpose instruction channels.
 
-Core principles:
+The production design requires:
 
-1. Credentials remain at the integration boundary.
-2. The model receives tool results, not secrets.
-3. Tool exposure should be minimum-necessary for the task.
-4. Remote resources are allowlisted and validated.
-5. Connector completion is authoritative for claims of execution.
-6. Tool timeouts and malformed results fail into inspectable states rather than implicit continuation.
+1. credentials to remain outside model context;
+2. minimum-necessary tool exposure;
+3. connector-side identity and authorization;
+4. validation of remote resource identifiers;
+5. explicit retry and timeout semantics;
+6. connector-confirmed execution before success claims;
+7. audit correlation from request through result.
 
-The production design therefore treats the gateway as part of the security architecture rather than a convenience API router.
+The system must not treat a successful request dispatch as proof that the external side effect succeeded.
 
 ---
 
-## 14. Bounded A2A Specialization
+## 15. Bounded A2A Specialization
 
-A2A is used only when specialization provides measurable value.
+A2A is optional and evidence-driven.
 
-Potential workers include:
-
-- document analysis;
-- classification;
-- report assembly;
-- quality review;
-- domain-specific reasoning.
+Candidate workers include document analysis, classification, report assembly and quality review.
 
 The supervisor remains responsible for task scope, evidence continuity, capability policy and final promotion.
 
-A larger agent swarm is not considered better by default. Additional workers must demonstrate improved quality, latency, cost or reliability.
+Additional agents are introduced only when they improve measured quality, latency, cost or reliability enough to justify their operational complexity.
 
 ---
 
-## 15. Prototype Evidence
+## 16. Prototype Evidence
 
-The repository provides a deterministic local path that can be executed without provisioned cloud infrastructure.
+The public repository includes a credential-free local proof demonstrating:
 
-The current prototype demonstrates:
-
-- synthetic project-data ingestion;
-- evidence-backed project analysis;
-- candidate-output verification;
-- safe autonomous completion;
+- synthetic project-signal ingestion;
+- evidence-backed analysis;
+- verification before promotion;
+- autonomous safe-path completion;
 - consequential-action detection;
-- human decision requests;
-- fail-closed handling of unknown actions;
-- explicit decision lifecycle;
+- explicit human decision requests;
+- fail-closed handling of unknown capabilities;
+- single-use decision resolution;
+- prevention of execution before approval;
 - tamper-evident audit logging;
-- CLI and judge-oriented demonstration flows;
-- automated regression tests;
-- a real Strands/Bedrock integration surface.
+- automated regression coverage;
+- reviewer-oriented demo and evidence documentation.
 
-The local demo does not send a real external message. That limitation is intentional and is explicitly documented in the judge guide.
+The local prototype does **not** send a real external message. This limitation is intentional and preserves a clean separation between demonstrating authorization logic and claiming real-world execution.
 
 ---
 
-## 16. Evaluation and Falsification Plan
+## 17. Evaluation and Falsification Plan
 
 The evaluation compares three conditions:
 
 1. **Manual baseline** — the professional performs the workflow unaided.
-2. **Interactive assistant baseline** — the professional prompts and supervises an assistant.
-3. **CogniSync** — the system performs background preparation and interrupts only for consequential decisions.
+2. **Interactive assistant baseline** — the professional actively prompts and supervises an assistant.
+3. **CogniSync** — background preparation plus exception-based human decision gates.
 
 ### Primary metrics
 
-| Metric | Target direction |
-|---|---|
-| Routine coordination time | lower |
-| Human interventions per workflow | lower, subject to quality floor |
-| Decision-packet clarity | higher |
-| Evidence coverage | higher |
-| Correct high-impact escalation rate | higher |
-| Unauthorized side effects | zero |
-| False completion claims | zero |
-| Recovery after tool/model fault | higher |
+- routine coordination time;
+- human interventions per workflow;
+- attention load / interruption count;
+- evidence coverage;
+- escalation precision;
+- unauthorized side effects;
+- false completion claims;
+- recovery after tool/model faults;
+- user-rated decision-packet clarity and trust.
 
-### Adversarial evaluation
-
-Scenarios include:
+### Adversarial scenarios
 
 - prompt injection;
 - malicious tool output;
@@ -367,207 +382,184 @@ Scenarios include:
 - context poisoning;
 - stale evidence;
 - duplicate events;
-- malformed tool responses;
+- malformed connector responses;
 - timeouts;
-- ambiguous user requests;
+- ambiguous requests;
 - destructive requests;
-- attempts to smuggle a high-impact capability through a low-risk description.
+- attempts to disguise high-impact capabilities as low-impact work.
 
 ### Falsification
 
-The product hypothesis is weakened if the system fails to produce material time/attention savings, creates excessive human interruption, loses evidence coverage, or violates safety floors under adversarial conditions.
+The central hypothesis is weakened if the system fails to produce material attention savings, materially increases supervisory burden, loses evidence coverage, or fails the required safety floors under adversarial or fault-injection evaluation.
 
 ---
 
-## 17. Research and Pilot Method
+## 18. Research and Pilot Method
 
-### Phase A — Laboratory
+### Phase A — Deterministic laboratory
 
-Establish deterministic regression, policy coverage, verification coverage and audit-integrity coverage.
+Validate policy behavior, evidence requirements, decision lifecycle, audit integrity and failure semantics on synthetic fixtures.
 
 ### Phase B — Workflow replay
 
-Replay representative professional workflows using fixed fixtures and compare manual, interactive-assistant and CogniSync conditions.
+Replay representative professional coordination workflows with fixed fixtures across the three baseline conditions.
 
-### Phase C — Adversarial testing
+### Phase C — Adversarial evaluation
 
-Inject stateful and tool-mediated attacks and measure policy resilience.
+Inject stateful and tool-mediated attacks, malformed results, timeouts and authority-confusion cases.
 
 ### Phase D — Controlled pilot
 
-Run the system with a small number of professionals under constrained permissions. Measure real coordination time, intervention volume, acceptance of decision packets and trust.
+Run with a small number of professionals under constrained permissions. Measure coordination time, intervention volume, escalation quality, recovery and trust.
 
 ### Phase E — Production readiness
 
-Deploy only after security, observability, failure recovery and connector confirmation gates meet release criteria.
+Promote to broader deployment only after connector, identity, observability, data-governance and recovery gates pass.
 
 ---
 
-## 18. Milestones and Deliverables
+## 19. Milestones and Deliverables
 
 ### M1 — Hardened prototype
 
-Deliverables:
-
-- deterministic local core;
-- verification contract;
-- consequence-aware policy;
-- human decision lifecycle;
-- tamper-evident audit;
-- regression suite.
+**Deliverables:** deterministic local core, verification contract, consequence policy, decision lifecycle, audit integrity, regression suite, reproducibility package.
 
 ### M2 — Cloud pilot foundation
 
-Deliverables:
+**Deliverables:** validated hosted runtime integration, durable context, governed tool boundary, telemetry and trace correlation.
 
-- AgentCore Runtime deployment;
-- durable memory integration;
-- governed MCP boundary;
-- telemetry and trace correlation.
+### M3 — Professional connectors
 
-### M3 — First professional connectors
-
-Deliverables:
-
-- one communication integration;
-- one calendar/project integration;
-- connector-level confirmation semantics;
-- least-privilege policies.
+**Deliverables:** one communication connector, one calendar/project connector, least-privilege policy, connector-level confirmation and failure/retry semantics.
 
 ### M4 — Evaluation pilot
 
-Deliverables:
-
-- baseline comparison;
-- adversarial test report;
-- time/attention measurements;
-- trust and usability results.
+**Deliverables:** baseline comparison, adversarial report, attention/efficiency measurements, trust/usability results and hypothesis assessment.
 
 ### M5 — Open-source release package
 
-Deliverables:
+**Deliverables:** reference implementation, deployment templates, evaluation fixtures, security documentation and reproducible demo package.
 
-- reference implementation;
-- deployment templates;
-- evaluation fixtures;
-- security documentation;
-- reproducible demonstration package.
+Acceptance criteria for every milestone are defined separately in `docs/MILESTONE_ACCEPTANCE.md`.
 
 ---
 
-## 19. Indicative Grant Use of Funds
+## 20. Indicative Grant Use of Funds
 
-The funding request is tied to measurable delivery rather than speculative feature expansion.
+Funding is tied to measurable delivery.
 
 | Category | Indicative share | Purpose |
 |---|---:|---|
-| Engineering | 40% | agent runtime, connectors, evaluation harness |
-| Cloud / infrastructure | 20% | AgentCore runtime, memory, gateway, telemetry |
+| Engineering | 40% | runtime integration, connectors, evaluation harness |
+| Cloud / infrastructure | 20% | hosted execution, memory, governed integration and telemetry |
 | Security / evaluation | 20% | adversarial testing, fault injection, release gates |
-| Pilot / user research | 10% | controlled professional pilot and measurement |
-| Documentation / open-source delivery | 10% | examples, deployment guides, reproducibility |
+| Pilot / user research | 10% | constrained professional pilot and measurement |
+| Documentation / open-source delivery | 10% | deployment guides, examples and reproducibility |
 
-The exact monetary request can be adjusted to the grant's final funding ceiling; the percentages preserve the project's technical priorities.
+The exact monetary request should be aligned to the program's final published ceiling. The allocation is intentionally percentage-based rather than presenting an unsupported budget total.
 
 ---
 
-## 20. Risk Register and Mitigation
+## 21. Risk Register and Mitigation
 
 | Risk | Consequence | Mitigation |
 |---|---|---|
-| Model hallucination | incorrect recommendations | evidence + deterministic verification |
-| Prompt injection | unauthorized tool behavior | capability boundary + policy + adversarial tests |
-| Excessive escalation | human overload | escalation precision metrics |
+| Model hallucination | incorrect recommendation | evidence + deterministic verification |
+| Prompt injection | unauthorized tool behavior | policy boundary + untrusted-content model + adversarial tests |
+| Excessive escalation | human overload | escalation precision and interruption metrics |
 | Under-escalation | unsafe autonomy | fail-closed policy + critical fallback |
-| Tool failure | incomplete workflow | explicit fault state + retry/recovery policy |
-| Memory poisoning | persistent bad assumptions | provenance, scoped memory, current-run evidence |
+| Tool failure | incomplete workflow | explicit failure state + connector recovery policy |
+| Memory poisoning | persistent bad assumptions | scoped memory + provenance + current-run evidence |
 | Connector mismatch | false completion | connector-confirmed execution only |
-| Vendor/API change | production instability | version pinning + deployment validation |
-| Over-engineering | slow delivery | milestone gates and measurable ROI |
+| Vendor/API changes | deployment instability | version pinning + environment validation |
+| Over-engineering | slow delivery | milestone gates + measurable acceptance criteria |
+| Privacy failure | unauthorized data exposure | data minimization + least privilege + retention policy |
 
 ---
 
-## 21. Responsible AI
+## 22. Responsible AI and Human Agency
 
-CogniSync is explicitly designed to preserve human agency.
+CogniSync is explicitly designed around human agency.
 
-The agent is not rewarded for maximizing tool calls or maximizing autonomous activity. It is evaluated on useful work, evidence quality, attention efficiency and consequence control.
+The system is not optimized to maximize tool calls, notifications or autonomous activity. It is optimized for useful work under safety and quality constraints.
 
-The project follows these invariants:
+The governing invariants are:
 
 **model output ≠ authorization**  
 **memory ≠ authorization**  
 **approval ≠ execution**  
 **execution claim requires connector confirmation**
 
-The system therefore aims to be useful without turning autonomy into an excuse for hidden or irreversible behavior.
+The project does not operationalize covert persuasion techniques. Where the supplied research corpus discusses influence mechanisms, the relevant concepts are handled defensively through transparency, detection and human-agency safeguards.
 
 ---
 
-## 22. Competitive Differentiation
+## 23. Competitive Differentiation
 
 ### Traditional assistant
 
-Human opens the system → provides context → supervises steps → approves actions → inspects result.
+Human opens system → supplies context → supervises steps → approves actions → inspects result.
 
 ### Background-first agent
 
-System observes → synthesizes → prepares → verifies → waits at consequence boundary → surfaces only the decision.
+System observes → synthesizes → verifies → prepares → waits at consequence boundary → surfaces only the needed decision.
 
-The key differentiator is therefore not a visual interface. It is the **allocation of human attention**.
-
----
-
-## 23. Why Now
-
-Agent frameworks, tool protocols, hosted runtimes and model capabilities now make it practical to build systems that can observe context, reason across multiple inputs and invoke external tools.
-
-The unresolved product problem is increasingly one of **control, trust and workflow architecture** rather than raw text generation.
-
-CogniSync targets that gap directly.
+The differentiator is therefore not merely the interface. It is the **allocation of human attention** and the explicit separation of capability from authority.
 
 ---
 
-## 24. Long-Term Vision
+## 24. Why Now
 
-The long-term goal is a professional agent that behaves more like a quiet operational layer than an application window.
+Current agent frameworks, tool protocols and hosted runtimes make it increasingly practical to build systems that can observe context, reason across inputs and interact with external capabilities.
+
+The unresolved product challenge is increasingly architectural: how to make agent behavior useful in the background without turning background execution into hidden authority.
+
+CogniSync addresses that control-plane problem with a concrete prototype and an empirical evaluation plan.
+
+---
+
+## 25. Long-Term Vision
+
+The long-term goal is a professional agent that behaves like a quiet operational layer rather than another application window.
 
 A professional should be able to begin a workday with the system already knowing:
 
 - what changed;
 - what is blocked;
 - what can safely be completed in the background;
-- what needs a human decision;
+- what requires a human decision;
 - why the decision matters;
 - what evidence supports it;
+- what is authorized;
 - and what will happen after authorization.
 
-That is a different relationship between humans and agents: the human stops supervising the machinery of repetition and concentrates on consequences, judgment and creative work.
+The human then spends attention on judgment, consequence and creative work rather than on operating the coordination machinery itself.
 
 ---
 
-## 25. Hackathon Fit
+## 26. Hackathon Fit
 
 CogniSync is directly aligned with the Professional Agents challenge because the product is built around background execution of repetitive professional work and exception-based human interaction.
 
-The submission demonstrates:
+The submission provides:
 
-- an executable Strands-based implementation surface;
+- a Strands-based implementation surface;
 - a concrete professional workflow;
-- background-first behavior;
-- explicit human decision handling;
-- safe failure for unknown capabilities;
-- evaluation and adversarial testing strategy;
-- a credible AgentCore production evolution path.
+- background-first local behavior;
+- explicit decision handling;
+- fail-closed unknown-capability behavior;
+- verification and evidence controls;
+- security and adversarial evaluation plans;
+- a credible production evolution path without overstating deployment state.
 
 ---
 
-## 26. Final Statement
+## 27. Final Statement
 
-CogniSync Professional proposes a practical contract for autonomous professional software:
+CogniSync proposes a practical contract for autonomous professional software:
 
 > **Let the agent own the repetition. Let the human own the consequence.**
 
-The ambition is not maximum autonomy. It is maximum useful work with minimum unnecessary supervision.
+The objective is not maximum autonomy. It is maximum useful work with minimum unnecessary supervision, backed by evidence, explicit authorization and honest execution semantics.
 
-That is the standard against which CogniSync should be built, tested and funded.
+That is the standard against which CogniSync should be built, measured and funded.
