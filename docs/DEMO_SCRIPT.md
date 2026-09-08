@@ -4,57 +4,75 @@
 
 **Narration:**
 
-"Professionals do not need another chatbot to operate. They need repetitive work to disappear. CogniSync runs in the background, reads the signals that normally require manual attention, and surfaces a compact decision packet only when a human decision is actually needed."
+"Professionals do not need another chatbot to operate. They need repetitive coordination work to disappear. CogniSync runs in the background, reads project signals, verifies what it can support, and surfaces a compact decision packet only when human authority is required."
 
 Show the repository and the synthetic project input.
 
-## 0:35–1:35 — Run the prototype
+## 0:35–1:35 — Run the verified local prototype
 
 ```bash
 pip install -e '.[dev]'
 pytest -q
-python -m cognisync.cli --pretty
+python -m cognisync --pretty
 ```
 
 Show:
 
 - a successful autonomous run;
 - evidence attached to the insight;
-- the audit file.
+- the audit stream created locally.
 
-## 1:35–2:35 — Demonstrate the human gate
+Explain that the prototype is deterministic and does not require cloud credentials.
+
+## 1:35–2:35 — Demonstrate the consequence boundary
 
 ```bash
-COGNISYNC_SEND=1 python -m cognisync.cli --pretty
+python -m cognisync --demo-gate --pretty
 ```
 
 Point out:
 
-- the action is recognized as externally consequential;
-- no external message is sent;
-- the run changes to `decision_required`;
-- the audit records the gate.
+- the external capability is classified as high risk;
+- the run becomes `decision_required`;
+- evidence and proposed payload remain visible;
+- no external message is sent.
 
-**Key phrase:** "Autonomy stops exactly where consequence begins."
+**Key phrase:** "Capability is not authorization."
 
-## 2:35–3:35 — Explain the production architecture
+## 2:35–3:15 — Resolve the local decision
 
-Show `docs/ARCHITECTURE.md`.
+```bash
+python -m cognisync --demo-gate --approve --pretty
+```
+
+Then inspect:
+
+```text
+data/audit.jsonl
+```
+
+Point out the `decision.requested` and `decision.approved` events and the hash-chain fields.
+
+State explicitly: this is a local approval-state demonstration. It is not a real-world send.
+
+## 3:15–4:20 — Explain the production architecture
+
+Show `docs/ARCHITECTURE.md` and `docs/THREAT_MODEL.md`.
 
 Explain:
 
 - Strands is the cognition/orchestration layer;
-- AgentCore Gateway is the MCP integration boundary;
-- AgentCore Memory supplies durable context;
-- optional A2A workers handle bounded specialist jobs;
-- AgentCore Runtime is the hosted execution boundary.
+- a governed MCP/connector plane exposes narrow capabilities;
+- durable memory is contextual, not an authorization mechanism;
+- bounded A2A workers are optional and must prove measurable value;
+- consequential effects pass through policy, human authorization and trusted connector confirmation.
 
-## 3:35–4:25 — Show scalability
+## 4:20–5:00 — Why it matters
 
-Explain that the same design can connect to email, files, CRM and project systems while keeping authorization outside the model prompt. A2A workers can be added only when decomposition helps throughput, cost or specialization.
+"Most agent demos optimize for what the model can do. CogniSync optimizes for useful work per unit of human supervisory attention. It collects signals, prepares work and checks evidence in the background, then interrupts only when a consequence requires a human decision. The agent owns the repetition; the human owns the consequence."
 
-## 4:25–5:00 — Why it matters
+End on **CogniSync Professional** and the repository URL.
 
-"The product is not another assistant people must manage. It is an attention-management system. CogniSync takes the work humans repeatedly postpone — collecting signals, summarizing progress, preparing follow-ups, detecting blockers — and does it continuously. It brings the person back only for the decisions that deserve a person."
+## Demo integrity rules
 
-End on the repository URL and project name: **CogniSync Professional**.
+Never substitute a local approval event for external execution. Never claim an effect without connector confirmation. Keep the evidence, policy decision and audit trail visible during the demonstration.
