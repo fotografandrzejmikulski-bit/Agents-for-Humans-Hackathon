@@ -7,14 +7,14 @@ from typing import Any
 from .analysis import analyze_items
 from .audit import AuditLog
 from .decision import DecisionGate
-from .models import Insight, ProjectItem, RunResult
+from .models import ProjectItem, RunResult
 from .policy import DEFAULT_POLICY, AutonomyPolicy
 from .store import ProjectStore
 from .verification import VerificationResult, verify_insights
 
 
 class CogniSyncEngine:
-    """Background-first orchestration core with explicit verification and consequence boundaries."""
+    """Background-first orchestration with verification and a consequence boundary."""
 
     def __init__(
         self,
@@ -46,12 +46,17 @@ class CogniSyncEngine:
             insight_count=len(insights),
             evidence_count=len(evidence),
             verification_status=verification.status,
-            verification_errors=verification.errors,
+            verification_failures=list(verification.failures),
         )
 
         if not verification.passed:
-            summary = "The agent produced candidate insights but did not promote them because verification failed."
-            self.audit.record("run.completed", run_id=run_id, status="verification_failed")
+            summary = "Candidate work was rejected because the verification contract failed."
+            self.audit.record(
+                "run.completed",
+                run_id=run_id,
+                status="verification_failed",
+                verification_failures=list(verification.failures),
+            )
             return RunResult(run_id, "verification_failed", summary, [], audit_events=[])
 
         decision_request = None
@@ -91,7 +96,7 @@ class CogniSyncEngine:
         return None
 
     @staticmethod
-    def _summary(items: list[ProjectItem], insights: list[Insight], decision_request: Any) -> str:
+    def _summary(items: list[ProjectItem], insights: list[Any], decision_request: Any) -> str:
         base = (
             f"CogniSync processed {len(items)} inputs in background mode and produced "
             f"{len(insights)} verified evidence-backed insight(s)."
