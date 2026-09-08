@@ -17,20 +17,47 @@ def main() -> None:
     engine = CogniSyncEngine(ProjectStore(data_dir), AuditLog(audit_path))
 
     print("\nCOGNISYNC PROFESSIONAL — LOCAL DEMO\n")
-    result = engine.run("prepare today's project brief and identify decision points")
-    print("[1/3] BACKGROUND INTELLIGENCE")
-    print(json.dumps({"status": result.status, "summary": result.summary}, indent=2))
-    for insight in result.insights:
-        print(json.dumps({"title": insight.title, "summary": insight.summary, "evidence": insight.evidence, "confidence": insight.confidence}, indent=2))
+
+    background = engine.run("prepare today's project brief and identify decision points")
+    print("[1/4] BACKGROUND INTELLIGENCE")
+    print(json.dumps({
+        "status": background.status,
+        "summary": background.summary,
+        "insights": [
+            {
+                "title": insight.title,
+                "summary": insight.summary,
+                "evidence": insight.evidence,
+                "confidence": insight.confidence,
+            }
+            for insight in background.insights
+        ],
+    }, indent=2, ensure_ascii=False))
 
     gated = engine.run("prepare and send the client follow-up")
-    print("\n[2/3] CONSEQUENCE BOUNDARY")
-    print(json.dumps({"status": gated.status, "decision": str(gated.decision_request)}, indent=2))
+    print("\n[2/4] CONSEQUENCE BOUNDARY")
+    print(json.dumps({
+        "status": gated.status,
+        "decision_id": gated.decision_request.decision_id if gated.decision_request else None,
+        "action": gated.decision_request.action if gated.decision_request else None,
+        "risk": gated.decision_request.risk.value if gated.decision_request else None,
+        "evidence": gated.decision_request.evidence if gated.decision_request else [],
+        "external_execution": "not_performed",
+    }, indent=2, ensure_ascii=False))
 
-    print("\n[3/3] HUMAN RESOLUTION — SIMULATED")
+    print("\n[3/4] HUMAN RESOLUTION — LOCAL ONLY")
     if gated.decision_request:
-        resolution = engine.gate.resolve(gated.decision_request, approved=True)
-        print(json.dumps(resolution, indent=2))
+        resolution = engine.gate.resolve(gated.decision_request, approved=True, actor="demo-reviewer")
+        print(json.dumps({
+            "decision_id": resolution.request.decision_id,
+            "status": resolution.status.value,
+            "message": resolution.message,
+            "external_execution": "not_performed",
+        }, indent=2, ensure_ascii=False))
+
+    ok, checked, error = AuditLog(audit_path).verify_integrity()
+    print("\n[4/4] AUDIT INTEGRITY")
+    print(json.dumps({"verified": ok, "events_checked": checked, "error": error}, indent=2))
     print(f"\nAudit trail: {audit_path}")
 
 
