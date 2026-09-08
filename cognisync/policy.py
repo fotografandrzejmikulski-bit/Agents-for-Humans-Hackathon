@@ -3,15 +3,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Final
 
+from .capabilities import CAPABILITIES
 from .models import DecisionRequest, RiskLevel
 
 
 @dataclass(frozen=True, slots=True)
 class AutonomyPolicy:
-    """Model-independent capability authorization policy.
+    """Model-independent authorization policy.
 
-    The policy evaluates the requested capability, never the model's confidence.
-    Unknown capabilities are critical by design and cannot be auto-executed.
+    Authorization depends on the capability consequence class, never on model confidence.
+    Unknown capabilities are critical and require explicit human resolution.
     """
 
     safe_actions: frozenset[str]
@@ -19,6 +20,9 @@ class AutonomyPolicy:
 
     def classify(self, action: str) -> RiskLevel:
         normalized = self.normalize(action)
+        capability = CAPABILITIES.get(normalized)
+        if capability is not None:
+            return capability.risk
         if normalized in self.safe_actions:
             return RiskLevel.LOW
         if normalized in self.approval_actions:
@@ -40,7 +44,7 @@ class AutonomyPolicy:
         if risk is RiskLevel.LOW:
             return None
         from uuid import uuid4
-        from .models import DecisionStatus
+
         return DecisionRequest(
             decision_id=str(uuid4()),
             action=normalized,
@@ -48,7 +52,6 @@ class AutonomyPolicy:
             risk=risk,
             evidence=list(evidence),
             proposed_payload=dict(payload),
-            status=DecisionStatus.PENDING,
         )
 
     @staticmethod
